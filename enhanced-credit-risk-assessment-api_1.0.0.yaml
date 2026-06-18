@@ -1,0 +1,1304 @@
+openapi: 3.0.3
+info:
+  title: Enhanced Credit Risk Assessment API
+  description: |
+    API for generating credit risk assessment reports based on Open Banking transaction data.
+
+    **Features:**
+    - Credit score calculation (0-1000 scale)
+    - Rating classification (AAA to D)
+    - Financial metrics analysis
+    - Purpose/affordability assessment
+    - PDF report generation (5-page and 8-page versions)
+
+    **Currency:** SAR (Saudi Riyal) by default
+  version: 1.0.0
+  contact:
+    name: Neotek Development Team
+    email: dev@neotek.sa
+  x-ibm-name: enhanced-credit-risk-assessment-api
+  x-build-id: release-2026-04-01-2-2ede1f3
+  x-git-commit: 2ede1f3fb4dab5bf7f42ab33ea647fa0436685a9
+security:
+- OAuthProvider:
+  - credit_risk_assessment
+servers:
+- url: /credit-risk-assessment/v2
+tags:
+- name: Credit Risk
+  description: Credit risk assessment and report generation
+paths:
+  /credit-risk/getCreditRiskReport:
+    post:
+      tags:
+      - Credit Risk
+      summary: Generate Credit Risk Report (JSON)
+      description: "Generates a comprehensive credit risk assessment report based
+        on the customer's \nOpen Banking transaction data. Returns detailed JSON response
+        with score breakdown,\nfinancial metrics, and recommendations.\n"
+      operationId: getCreditRiskReport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRiskRequest'
+            examples:
+              basic:
+                summary: Basic Request
+                value:
+                  psuId: PSU123456
+                  accountLinkId: consent-uuid-123
+                  accountId: SA0380000000608010167519
+                  customerType: RETAIL
+              withPurpose:
+                summary: Request with Loan Purpose
+                value:
+                  psuId: PSU123456
+                  accountLinkId: consent-uuid-123
+                  accountId: SA0380000000608010167519
+                  customerType: RETAIL
+                  purpose: PERSONAL_FINANCE
+                  requestedAmount: 50000
+                  loanTermMonths: 36
+                  annualInterestRate: 3
+                  age: 35
+      responses:
+        "200":
+          description: Credit risk report generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditRiskReportResponse'
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /credit-risk/getCreditRiskReport/pdf:
+    post:
+      tags:
+      - Credit Risk
+      summary: Generate Credit Risk Report (PDF - 5 pages)
+      description: |
+        Generates a 5-page PDF credit risk report with:
+        - Page 1: Executive Summary
+        - Page 2: Credit Score Component Breakdown
+        - Page 3: Financial Health Indicators
+        - Page 4: Transaction Analysis
+        - Page 5: Loan Exposure & Final Recommendation
+      operationId: getCreditRiskReportPdf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRiskRequest'
+      responses:
+        "200":
+          description: PDF report generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: Attachment filename
+              schema:
+                type: string
+                example: attachment; filename="credit-risk-report-SA038-abc12345.pdf"
+        "400":
+          description: Invalid request parameters
+        "500":
+          description: Internal server error
+  /credit-risk/getCreditRiskReport/v2/pdf:
+    post:
+      tags:
+      - Credit Risk
+      summary: Generate Credit Risk Report (PDF V2 - 8 pages)
+      description: |
+        Generates an enhanced 8-page PDF credit risk report with:
+        - Page 1: Executive Summary
+        - Page 2: Credit Score Component Breakdown
+        - Page 3: Financial Health Indicators
+        - Page 4: Transaction Analysis
+        - Page 5: Loan Exposure & Debt Profile
+        - Page 6: Behavior Analysis
+        - Page 7: Monthly Breakdown
+        - Page 8: Final Recommendation (with Purpose Assessment)
+      operationId: getCreditRiskReportPdfV2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRiskRequest'
+      responses:
+        "200":
+          description: PDF V2 report generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: Attachment filename
+              schema:
+                type: string
+                example: attachment; filename="credit-risk-report-v2-SA038-abc12345.pdf"
+        "400":
+          description: Invalid request parameters
+        "500":
+          description: Internal server error
+components:
+  schemas:
+    CreditRiskRequest:
+      type: object
+      required:
+      - psuId
+      - accountLinkId
+      - accountId
+      properties:
+        psuId:
+          type: string
+          description: Payment Service User identifier
+          example: PSU123456
+        accountLinkId:
+          type: string
+          description: Account Link ID (consent identifier)
+          example: consent-uuid-123
+        accountId:
+          type: string
+          description: IBAN or account identifier
+          example: SA0380000000608010167519
+        customerType:
+          $ref: '#/components/schemas/CustomerType'
+        purpose:
+          $ref: '#/components/schemas/LoanPurpose'
+        requestedAmount:
+          type: number
+          format: decimal
+          description: Requested loan amount in SAR
+          example: 50000
+        loanTermMonths:
+          type: integer
+          description: Loan term in months (default 60, or 240 for HOME_MORTGAGE)
+          example: 36
+        annualInterestRate:
+          type: number
+          format: decimal
+          description: Annual interest rate as percentage (default 3.0%)
+          example: 3
+        age:
+          type: integer
+          description: Customer age in years (enables AGE factor scoring)
+          minimum: 18
+          maximum: 100
+          example: 35
+        riskFactors:
+          type: array
+          description: Optional custom risk factor configurations
+          items:
+            $ref: '#/components/schemas/RiskFactorConfig'
+    RiskFactorConfig:
+      type: object
+      description: Configuration for a single risk factor with custom weight and scoring
+        ranges
+      properties:
+        factorType:
+          $ref: '#/components/schemas/RiskFactorType'
+        weight:
+          type: integer
+          description: Custom weight for this factor (points contribution)
+          minimum: 0
+          maximum: 200
+          example: 150
+        ranges:
+          type: array
+          description: Custom scoring ranges for this factor
+          items:
+            $ref: '#/components/schemas/RangeConfig'
+        enabled:
+          type: boolean
+          description: Whether this factor is enabled
+          default: true
+    RangeConfig:
+      type: object
+      description: Configuration for a score range within a risk factor
+      properties:
+        minValue:
+          type: number
+          format: decimal
+          description: Minimum value for this range (inclusive)
+          example: 0
+        maxValue:
+          type: number
+          format: decimal
+          description: Maximum value for this range (exclusive)
+          example: 0.2
+        points:
+          type: integer
+          description: Points awarded when value falls in this range
+          minimum: 0
+          maximum: 100
+          example: 90
+        label:
+          type: string
+          description: Human-readable label for this range
+          example: Excellent
+    CreditRiskReportResponse:
+      type: object
+      properties:
+        reportId:
+          type: string
+          format: uuid
+          description: Unique report identifier
+          example: 550e8400-e29b-41d4-a716-446655440000
+        generatedAt:
+          type: string
+          format: date-time
+          description: Report generation timestamp
+          example: 2026-03-03T05:30:00
+        psuId:
+          type: string
+          example: PSU123456
+        accountLinkId:
+          type: string
+          example: consent-uuid-123
+        accountId:
+          type: string
+          example: SA0380000000608010167519
+        customerType:
+          $ref: '#/components/schemas/CustomerType'
+        totalScore:
+          type: integer
+          description: Total credit score (0-1000)
+          minimum: 0
+          maximum: 1000
+          example: 643
+        maxPossibleScore:
+          type: integer
+          description: Maximum possible score
+          example: 1000
+        ratingClass:
+          $ref: '#/components/schemas/CreditRatingClass'
+        ratingClassName:
+          type: string
+          description: Human-readable rating name
+          example: Satisfactory
+        ratingDescription:
+          type: string
+          description: Rating description
+          example: Adequate creditworthiness with moderate risk
+        approvalRecommendation:
+          type: string
+          description: Approval recommendation
+          enum:
+          - Very High
+          - High
+          - Moderate
+          - Low
+          - Very Low
+          - Reject
+          example: Moderate
+        factorScores:
+          type: array
+          items:
+            $ref: '#/components/schemas/FactorScore'
+        financialMetrics:
+          $ref: '#/components/schemas/FinancialMetrics'
+        customerProfile:
+          $ref: '#/components/schemas/CustomerProfile'
+        recommendation:
+          $ref: '#/components/schemas/CreditRecommendation'
+        purposeAssessment:
+          $ref: '#/components/schemas/PurposeAssessment'
+        metadata:
+          $ref: '#/components/schemas/ReportMetadata'
+    FactorScore:
+      type: object
+      properties:
+        factorName:
+          type: string
+          example: INCOME_STABILITY
+        displayName:
+          type: string
+          example: Income Stability
+        description:
+          type: string
+          example: Consistency and reliability of income sources
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 75
+        maxScore:
+          type: integer
+          example: 100
+        weight:
+          type: number
+          format: decimal
+          example: 0.2
+        weightedScore:
+          type: number
+          format: decimal
+          example: 150
+        grade:
+          type: string
+          enum:
+          - A
+          - B
+          - C
+          - D
+          - F
+          example: B
+        reasoning:
+          type: string
+          example: Strong income consistency with low volatility
+        isSkipped:
+          type: boolean
+          example: false
+        dataUnavailableReason:
+          type: string
+          description: Reason if factor was skipped
+    FinancialMetrics:
+      type: object
+      properties:
+        averageMonthlyIncome:
+          type: number
+          format: decimal
+          example: 15000
+        averageMonthlyExpenses:
+          type: number
+          format: decimal
+          example: 8500
+        averageMonthlyLoanPayment:
+          type: number
+          format: decimal
+          example: 2500
+        monthlySurplus:
+          type: number
+          format: decimal
+          example: 4000
+        debtToIncomeRatio:
+          type: number
+          format: decimal
+          description: DTI as decimal (0.25 = 25%)
+          example: 0.167
+        expenseToIncomeRatio:
+          type: number
+          format: decimal
+          example: 0.567
+        incomeVolatility:
+          type: number
+          format: decimal
+          description: Income coefficient of variation
+          example: 0.08
+        expenseVolatility:
+          type: number
+          format: decimal
+          example: 0.12
+        averageBalance:
+          type: number
+          format: decimal
+          example: 25000
+        minBalance:
+          type: number
+          format: decimal
+          example: 5000
+        maxBalance:
+          type: number
+          format: decimal
+          example: 45000
+        behaviorChangeDetected:
+          type: boolean
+          example: true
+        detectedChanges:
+          type: array
+          items:
+            $ref: '#/components/schemas/BehaviorChange'
+        monthlyBreakdowns:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonthlyBreakdown'
+        monthsOfData:
+          type: integer
+          example: 6
+        strengths:
+          type: array
+          items:
+            type: string
+          example:
+          - Consistent income pattern
+          - Low expense volatility
+        weaknesses:
+          type: array
+          items:
+            type: string
+          example:
+          - High debt-to-income ratio
+    BehaviorChange:
+      type: object
+      properties:
+        changeType:
+          type: string
+          example: HIGH_INCOME_VOLATILITY
+        severity:
+          type: string
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - CRITICAL
+          example: MEDIUM
+        description:
+          type: string
+          example: Income volatility increased by 15% compared to previous period
+        changePercent:
+          type: number
+          format: decimal
+          example: 0.15
+    MonthlyBreakdown:
+      type: object
+      properties:
+        month:
+          type: string
+          example: 2026-01
+        income:
+          type: number
+          format: decimal
+          example: 15500
+        expenses:
+          type: number
+          format: decimal
+          example: 8200
+        loanPayment:
+          type: number
+          format: decimal
+          example: 2500
+        surplus:
+          type: number
+          format: decimal
+          example: 4800
+    CustomerProfile:
+      type: object
+      properties:
+        accountAge:
+          type: string
+          example: 2 years 3 months
+        transactionCount:
+          type: integer
+          example: 245
+        primaryIncomeSource:
+          type: string
+          example: SALARY
+        riskProfile:
+          type: string
+          enum:
+          - CONSERVATIVE
+          - MODERATE
+          - AGGRESSIVE
+          example: MODERATE
+    CreditRecommendation:
+      type: object
+      properties:
+        decision:
+          type: string
+          enum:
+          - APPROVE
+          - CONDITIONAL_APPROVE
+          - REVIEW
+          - DECLINE
+          example: CONDITIONAL_APPROVE
+        maxRecommendedAmount:
+          type: number
+          format: decimal
+          example: 40000
+        suggestedInterestRate:
+          type: number
+          format: decimal
+          example: 4.5
+        conditions:
+          type: array
+          items:
+            type: string
+          example:
+          - Verify employment
+          - Limit initial credit
+        summary:
+          type: string
+          example: Applicant shows moderate creditworthiness. Recommend approval with
+            conditions.
+    PurposeAssessment:
+      type: object
+      description: Only populated if purpose and requestedAmount are provided in request
+      properties:
+        purpose:
+          $ref: '#/components/schemas/LoanPurpose'
+        purposeDisplayName:
+          type: string
+          example: Personal Finance
+        requestedAmount:
+          type: number
+          format: decimal
+          example: 50000
+        isAffordable:
+          type: boolean
+          example: false
+        estimatedMonthlyPayment:
+          type: number
+          format: decimal
+          example: 1140.17
+        debtToIncomeAfterLoan:
+          type: string
+          example: 25.5%
+        affordabilityAssessment:
+          type: string
+          example: May strain finances; consider lower amount
+        riskLevel:
+          type: string
+          enum:
+          - Low
+          - Medium
+          - High
+          example: High
+    ReportMetadata:
+      type: object
+      properties:
+        factorsEvaluated:
+          type: integer
+          example: 8
+        factorsSkipped:
+          type: integer
+          example: 2
+        skippedFactorReasons:
+          type: array
+          items:
+            type: string
+          example:
+          - 'AGE: Age not provided in request'
+        weightsRedistributed:
+          type: boolean
+          example: true
+        dataQualityNote:
+          type: string
+          example: 6 months of transaction data available
+    CustomerType:
+      type: string
+      enum:
+      - RETAIL
+      - CORPORATE
+      default: RETAIL
+      description: Customer type for credit risk assessment
+    LoanPurpose:
+      type: string
+      enum:
+      - PERSONAL_FINANCE
+      - CAR_LOAN
+      - HOME_MORTGAGE
+      - EDUCATION
+      - MEDICAL
+      - BUSINESS
+      - DEBT_CONSOLIDATION
+      - TRAVEL
+      - WEDDING
+      - HOME_IMPROVEMENT
+      - OTHER
+      description: Purpose of the loan request
+    CreditRatingClass:
+      type: string
+      enum:
+      - AAA
+      - AA
+      - A
+      - BBB
+      - BB
+      - B
+      - CCC
+      - CC
+      - C
+      - D
+      description: |
+        Credit rating classification:
+        - AAA (900-1000): Excellent
+        - AA (800-899): Very Good
+        - A (700-799): Good
+        - BBB (600-699): Satisfactory
+        - BB (500-599): Fair
+        - B (400-499): Marginal
+        - CCC (300-399): Weak
+        - CC (200-299): Very Weak
+        - C (100-199): Extremely Weak
+        - D (0-99): Default/Reject
+    RiskFactorType:
+      type: string
+      enum:
+      - AGE
+      - INCOME
+      - LOAN_PAYMENT
+      - SURPLUS_RATIO
+      - SALARY_CATEGORY
+      - CASH_FLOW
+      - DEBT_BURDEN_RATIO
+      - BUSINESS_AGE
+      - REVENUE_STABILITY
+      - REVENUE_TREND
+      - OPERATING_EXPENSE_RATIO
+      - SUPPLIER_PAYMENT_CONSISTENCY
+      - CASH_BUFFER
+      - CORPORATE_CASH_FLOW
+      - PAYMENT_BEHAVIOR
+      description: |
+        Types of risk factors used in credit scoring.
+        Retail factors: AGE, INCOME, LOAN_PAYMENT, SURPLUS_RATIO, SALARY_CATEGORY, CASH_FLOW, DEBT_BURDEN_RATIO
+        Corporate factors: BUSINESS_AGE, REVENUE_STABILITY, REVENUE_TREND, OPERATING_EXPENSE_RATIO, SUPPLIER_PAYMENT_CONSISTENCY, CASH_BUFFER, CORPORATE_CASH_FLOW, PAYMENT_BEHAVIOR
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: PSU ID is required
+        path:
+          type: string
+          example: /credit-risk/getCreditRiskReport
+  securitySchemes:
+    OAuthProvider:
+      type: oauth2
+      x-ibm-oauth-provider: oauth2security
+      description: OAuth2 Client Credentials flow. It is required when client requests
+        access to service APIs.
+      flows:
+        clientCredentials:
+          tokenUrl: https://{baseUrl}/oauth2security/oauth2/token
+          scopes:
+            credit_risk_assessment: Credit Risk Assessment API operations access
+x-ibm-configuration:
+  cors:
+    enabled: true
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  gateway: datapower-api-gateway
+  assembly:
+    execute:
+    - parse:
+        version: 2.2.0
+        title: parse
+        parse-settings-reference:
+          default: apic-default-parsesettings
+    - gatewayscript:
+        version: 2.0.0
+        title: Log REQ
+        source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogReq([],[],[],['Authorization']);\r\n"
+    - gatewayscript:
+        version: 2.0.0
+        title: Auditing Request Parameters
+        source: "let body = context.get('message.body');\r\nlet psuId = body.psuId;\r\nlet
+          accountLinkId = body.accountLinkId;\r\nlet accountId = body.accountId;\r\n\r\nif
+          (accountLinkId) {\r\n  context.set(\"GP.FRAMEWORK.UsrDef2\", accountLinkId);\r\n}\r\n\r\nif
+          (psuId) {\r\n  context.set(\"GP.FRAMEWORK.UsrDef3\", psuId);\r\n}\r\n\r\nif
+          (accountId) {\r\n  context.set(\"GP.FRAMEWORK.UsrDef4\", accountId);\r\n}\r\n\r\ncontext.set('requestBody',
+          body);"
+    - gatewayscript:
+        version: 2.0.0
+        title: Prepare Sponsored TPP Request
+        source: "let sponsoredTppURL = context.get('sponsored-tpp-url');\r\nlet client
+          = context.get('client.app.name');\r\n\r\nlet updatedSponsoredTppURL = `${sponsoredTppURL}?ApplicationId=${client}`;\r\n\r\ncontext.set('sposoredTPPURL',
+          updatedSponsoredTppURL);"
+    - gatewayscript:
+        version: 2.0.0
+        title: Log IREQ
+        source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n\r\nFramework.FWLogIReq('Core-GetSponsoredTPPId',true,[context.get('sposoredTPPURL')],[]);"
+    - invoke:
+        version: 2.0.0
+        title: GetSponsoredTPPId:invoke
+        backend-type: json
+        header-control:
+          type: blocklist
+          values: []
+        parameter-control:
+          type: blocklist
+          values: []
+        timeout: 60
+        verb: GET
+        chunked-uploads: true
+        persistent-connection: true
+        target-url: $(sposoredTPPURL)
+        description: Invoke GetSponsoredTPPId
+        stop-on-error:
+        - ConnectionError
+    - gatewayscript:
+        version: 2.0.0
+        title: Log IRPLY
+        source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogIReply('Core-GetSponsoredTPPId');"
+    - parse:
+        version: 2.1.0
+        title: parse
+        parse-settings-reference:
+          default: apic-default-parsesettings
+    - gatewayscript:
+        version: 2.0.0
+        title: Extract SponsoredTPPId
+        source: "let messageBody = context.get(\"message.body\");\r\ncontext.set(\"message.body\",
+          {});\r\n\r\nlet HTTPStatusCode = context.get(\"message.status.code\");\r\n\r\nif
+          (HTTPStatusCode != 200 || messageBody == null || messageBody.Data == null)
+          {\r\n    context.reject(\"MissingApplicationError\", \"Application doesn't
+          exist\");\r\n} else {\r\n    context.set(\"SponsoredTppId\", messageBody.Data.SponsoredTppId);\r\n}\r\n"
+    - gatewayscript:
+        version: 2.0.0
+        title: Restore Request Body
+        source: |-
+          let request = context.get('requestBody');
+
+          request.sponsoredTppId = context.get('SponsoredTppId');
+
+          context.set('message.body',request);
+    - switch:
+        version: 2.0.0
+        title: switch
+        case:
+        - condition: ($httpVerb() = 'POST' and $operationPath() = '/credit-risk/getCreditRiskReport')
+          execute:
+          - gatewayscript:
+              version: 2.0.0
+              title: Prepare Backend URL
+              source: |-
+                const operationPath = context.get('api.operation.path');
+
+                const targetURL = context.get('target-url');
+
+                const updatedBackendURL = `${targetURL}${operationPath}`;
+
+                context.set('updatedURL', updatedBackendURL)
+          - gatewayscript:
+              version: 2.0.0
+              title: Build Headers
+              source: "context.clear(\"message.headers.Authorization\");\r\nlet xRequestId
+                = context.get(\"request.headers.x-request-id\");\r\n\r\n\r\nif(!xRequestId){\r\n
+                \   xRequestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function(c) {\r\n        const r = Math.random() * 16 | 0,\r\n              v
+                = c === 'x' ? r : (r & 0x3 | 0x8);\r\n        return v.toString(16);\r\n
+                \     });\r\n}\r\n\r\ncontext.set('message.headers.x-request-id',xRequestId);"
+          - gatewayscript:
+              version: 2.0.0
+              title: Log IREQ
+              source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nlet
+                xRequestId = context.get(\"message.headers.x-request-id\");\r\n\r\ncontext.set(\"GP.FRAMEWORK.UsrDef1\",
+                xRequestId);\r\n\r\nFramework.FWLogIReq('Core-CreateCRA-Report',true,[],[]);"
+          - invoke:
+              version: 2.0.0
+              title: CreateCRAReport:invoke
+              backend-type: detect
+              header-control:
+                type: blocklist
+                values: []
+              parameter-control:
+                type: blocklist
+                values: []
+              timeout: 60
+              verb: keep
+              chunked-uploads: true
+              persistent-connection: true
+              target-url: $(updatedURL)
+              description: Invoke CreateCRAReport
+              stop-on-error:
+              - ConnectionError
+              graphql-send-type: detect
+          - gatewayscript:
+              version: 2.0.0
+              title: Log IRPLY
+              source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogIReply('Core-CreateCRA-Report');"
+          - parse:
+              version: 2.0.0
+              title: Parse Response
+              parse-settings-reference:
+                parse-settings:
+                  document_type: json
+                  max_doc_size: 8388608
+                  max_nesting_depth: 512
+                  max_width: 8192
+                  max_name_length: 256
+                  max_value_length: 8388608
+                  max_unique_names: 1024
+                  max_unique_prefixes: 1024
+                  max_unique_namespaces: 1024
+          - gatewayscript:
+              version: 2.0.0
+              title: Process Response
+              source: "context.set(\"backendName\", \"core\");\r\n\r\nlet messageBody
+                = context.get(\"message.body\");\r\n\r\nlet HTTPStatusCode = context.get(\"message.status.code\");\r\n\r\nif
+                (HTTPStatusCode != 200) {\r\n  if (messageBody.Errors && messageBody.Errors[0])
+                {\r\n    context.set(\"errorCode\", messageBody.Errors[0].Code);\r\n
+                \   context.set(\"errorMessage\", messageBody.Errors[0].Message.en);\r\n
+                \ } else {\r\n    context.set(\"errorCode\", \"ERROR.400.199\");\r\n
+                \   context.set(\"errorMessage\", \"Core General Error\");\r\n  }\r\n
+                \ context.reject(\"CoreError\", \"Bad Request From Core\");\r\n}\r\n"
+        - condition: ($httpVerb() = 'POST' and $operationPath() = '/credit-risk/getCreditRiskReport/pdf')
+          execute:
+          - gatewayscript:
+              version: 2.0.0
+              title: Prepare Backend URL
+              source: |-
+                const operationPath = context.get('api.operation.path');
+
+                const targetURL = context.get('target-url');
+
+                const updatedBackendURL = `${targetURL}${operationPath}`;
+
+                context.set('updatedURL', updatedBackendURL)
+          - gatewayscript:
+              version: 2.0.0
+              title: Build Headers
+              source: "let clientID = context.get('clientID');\r\nlet clientSecret
+                = context.get('clientSecret');\r\n\r\ncontext.clear(\"message.headers.Authorization\");\r\nlet
+                xRequestId = context.get(\"request.headers.x-request-id\");\r\n\r\n\r\nif(!xRequestId){\r\n
+                \   xRequestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function(c) {\r\n        const r = Math.random() * 16 | 0,\r\n              v
+                = c === 'x' ? r : (r & 0x3 | 0x8);\r\n        return v.toString(16);\r\n
+                \     });\r\n}\r\n\r\ncontext.set('message.headers.x-request-id',xRequestId);\r\n"
+          - gatewayscript:
+              version: 2.0.0
+              title: Log IREQ
+              source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nlet
+                xRequestId = context.get(\"message.headers.x-request-id\");\r\n\r\ncontext.set(\"GP.FRAMEWORK.UsrDef1\",
+                xRequestId);\r\n\r\nFramework.FWLogIReq('Core-CreateCRA-PDF',true,[context.get('queryString')],[]);"
+          - invoke:
+              version: 2.0.0
+              title: CoreCreateCRAPDF:invoke
+              backend-type: detect
+              header-control:
+                type: blocklist
+                values: []
+              parameter-control:
+                type: blocklist
+                values: []
+              timeout: 60
+              verb: keep
+              chunked-uploads: true
+              persistent-connection: true
+              target-url: $(updatedURL)
+              description: Invoke CoreCreateCRAPDF
+              stop-on-error:
+              - ConnectionError
+              graphql-send-type: detect
+          - gatewayscript:
+              version: 2.0.0
+              title: Log IRPLY
+              source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogIReply('Core-CreateCRA-PDF');"
+          - parse:
+              version: 2.0.0
+              title: Parse Response
+              parse-settings-reference:
+                parse-settings:
+                  document_type: json
+                  max_doc_size: 8388608
+                  max_nesting_depth: 512
+                  max_width: 8192
+                  max_name_length: 256
+                  max_value_length: 8388608
+                  max_unique_names: 1024
+                  max_unique_prefixes: 1024
+                  max_unique_namespaces: 1024
+          - gatewayscript:
+              version: 2.0.0
+              title: Process Response
+              source: "context.set(\"backendName\", \"core\");\r\n\r\nlet messageBody
+                = context.get(\"message.body\");\r\n\r\nlet HTTPStatusCode = context.get(\"message.status.code\");\r\n\r\nif
+                (HTTPStatusCode != 200) {\r\n  if (messageBody.Errors && messageBody.Errors[0])
+                {\r\n    context.set(\"errorCode\", messageBody.Errors[0].Code);\r\n
+                \   context.set(\"errorMessage\", messageBody.Errors[0].Message.en);\r\n
+                \ } else {\r\n    context.set(\"errorCode\", \"ERROR.400.199\");\r\n
+                \   context.set(\"errorMessage\", \"Core General Error\");\r\n  }\r\n
+                \ context.reject(\"CoreError\", \"Bad Request From Core\");\r\n}\r\n"
+        - condition: ($httpVerb() = 'POST' and $operationPath() = '/credit-risk/getCreditRiskReport/v2/pdf')
+          execute:
+          - gatewayscript:
+              version: 2.0.0
+              title: Prepare Backend URL
+              source: |-
+                const operationPath = context.get('api.operation.path');
+
+                const targetURL = context.get('target-url');
+
+                const updatedBackendURL = `${targetURL}${operationPath}`;
+
+                context.set('updatedURL', updatedBackendURL)
+          - gatewayscript:
+              version: 2.0.0
+              title: Build Headers
+              source: "context.clear(\"message.headers.Authorization\");\r\nlet xRequestId
+                = context.get(\"request.headers.x-request-id\");\r\n\r\n\r\nif(!xRequestId){\r\n
+                \   xRequestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function(c) {\r\n        const r = Math.random() * 16 | 0,\r\n              v
+                = c === 'x' ? r : (r & 0x3 | 0x8);\r\n        return v.toString(16);\r\n
+                \     });\r\n}\r\n\r\ncontext.set('message.headers.x-request-id',xRequestId);\r\n"
+          - gatewayscript:
+              version: 2.0.0
+              title: Log IREQ
+              source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nlet
+                xRequestId = context.get(\"message.headers.x-request-id\");\r\n\r\ncontext.set(\"GP.FRAMEWORK.UsrDef1\",
+                xRequestId);\r\n\r\nFramework.FWLogIReq('Core-CreateCRA-PDF-V2',true,[context.get('queryString')],[]);"
+          - invoke:
+              version: 2.0.0
+              title: CoreCreateCRAPDFV2:invoke
+              backend-type: detect
+              header-control:
+                type: blocklist
+                values: []
+              parameter-control:
+                type: blocklist
+                values: []
+              timeout: 60
+              verb: keep
+              chunked-uploads: true
+              persistent-connection: true
+              target-url: $(updatedURL)
+              description: Invoke CoreCreateCRAPDFV2
+              stop-on-error:
+              - ConnectionError
+              graphql-send-type: detect
+          - gatewayscript:
+              version: 2.0.0
+              title: Log IRPLY
+              source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogIReply('Core-CreateCRA-PDF-V2');"
+          - parse:
+              version: 2.0.0
+              title: Parse Response
+              parse-settings-reference:
+                parse-settings:
+                  document_type: json
+                  max_doc_size: 8388608
+                  max_nesting_depth: 512
+                  max_width: 8192
+                  max_name_length: 256
+                  max_value_length: 8388608
+                  max_unique_names: 1024
+                  max_unique_prefixes: 1024
+                  max_unique_namespaces: 1024
+          - gatewayscript:
+              version: 2.0.0
+              title: Process Response
+              source: "context.set(\"backendName\", \"core\");\r\n\r\nlet messageBody
+                = context.get(\"message.body\");\r\n\r\nlet HTTPStatusCode = context.get(\"message.status.code\");\r\n\r\nif
+                (HTTPStatusCode != 200) {\r\n  if (messageBody.Errors && messageBody.Errors[0])
+                {\r\n    context.set(\"errorCode\", messageBody.Errors[0].Code);\r\n
+                \   context.set(\"errorMessage\", messageBody.Errors[0].Message.en);\r\n
+                \ } else {\r\n    context.set(\"errorCode\", \"ERROR.400.199\");\r\n
+                \   context.set(\"errorMessage\", \"Core General Error\");\r\n  }\r\n
+                \ context.reject(\"CoreError\", \"Bad Request From Core\");\r\n}\r\n"
+    - gatewayscript:
+        version: 2.0.0
+        title: Log RPLY
+        source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+          Framework.FWLogReply();"
+    catch:
+    - errors:
+      - ConnectionError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build Response
+          source: "// Set Response Status\rcontext.set('message.status.code', 500);\rcontext.set('message.status.reason',
+            'Internal Server Error');\r\r// Build Response Body\rlet response = {};\rlet
+            Errors = [\r    {\r         \"Code\": \"NTSP.ERROR.500.002\",\r         \"Message\":
+            \"General Server Error\",\r         \"Url\": \"https://portal-www.apic1012.ejada.com\"\r
+            \   }\r]\rresponse.Errors = Errors;\rcontext.set('message.body', response);\r"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(500);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - IncorrectOperationError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build response
+          source: "// Set Response Status\rcontext.set('message.status.code', 405);\rcontext.set('message.status.reason',
+            'Method Not Allowed');\r\r// Build Response Headers\rlet outputHeaders
+            = {\r    \"Content-Type\": \"application/json\",\r    \"x-request-id\":
+            context.get('requestId')\r}\r\rcontext.clear('message.headers');\rcontext.set('message.headers',
+            outputHeaders);\r\r// Build Response Body\rlet response = {};\rlet Errors
+            = [\r    {\r        \"Code\": \"NTSP.ERROR.405.001\",\r        \"Message\":
+            \"Operation not Found\",\r        \"Url\": \"https://portal-www.apic1012.ejada.com\"\r
+            \   }\r]\r\rresponse.Errors = Errors;\r\rcontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(405);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - ValidateRequestError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build response
+          source: "// Set Response Status\r\ncontext.set('message.status.code', 400);\r\ncontext.set('message.status.reason',
+            'Bad Request');\r\n\r\n// Build Response Headers\r\nlet outputHeaders
+            = {\r\n    \"Content-Type\": \"application/json\",\r\n    \"x-request-id\":
+            context.get('requestId')\r\n}\r\n\r\ncontext.clear('message.headers');\r\ncontext.set('message.headers',
+            outputHeaders);\r\n\r\n// Build Response Body\r\nlet response = {};\r\nlet
+            Errors = Object.keys(context.get('ValidationErrors')).map(function(key){\r\n
+            \   return {\r\n        \"Code\": \"NTSP.ERROR.400.090\",\r\n        \"Message\":
+            context.get('ValidationErrors')[key].join(\" \"),\r\n        \"Path\":
+            \"request.\" + key,\r\n        \"Url\": \"https://portal-www.apic1012.ejada.com\",\r\n
+            \   }     \r\n});\r\n\r\nresponse.Errors = Errors;\r\n\r\ncontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(400);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - CoreError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Error Mapping
+          source: "let CommonComponents = require(\"local:/FRAMEWORK/FUNCTIONS/COMMON_COMPONENTS.js\");\r\n\r\nlet
+            sourceVal1 = context.get(\"errorCode\");\r\n\r\nCommonComponents.ErrorCodeMapping(\r\n
+            \ \"average-balance-core\",\r\n  sourceVal1,\r\n  \"*\",\r\n  \"*\",\r\n
+            \ function (resultCode, targetVal1, targetVal2, targetVal3) {\r\n    if
+            (resultCode == \"1\") {\r\n      //Mapping Success\r\n      context.set(\"mappedErrorCode\",
+            targetVal1);\r\n      if (targetVal2 && targetVal2.length !== 0) {\r\n
+            \       context.set(\"mappedErrorMessage\", targetVal2);\r\n      } else
+            {\r\n        context.set(\"mappedErrorMessage\", context.get(\"errorMessage\"));\r\n
+            \     }\r\n\r\n      if (!!targetVal3) context.set(\"mappedPath\", targetVal3);\r\n
+            \   } else {\r\n      //Mapping Failed\r\n      context.set(\"mappedErrorCode\",
+            \"NTSP.ERROR.400.002\");\r\n      let errorMessage = context.get(\"errorMessage\");\r\n
+            \     if (errorMessage) {\r\n        context.set(\"mappedErrorMessage\",
+            errorMessage);\r\n      } else {\r\n        context.set(\"mappedErrorMessage\",
+            \"Average Balance General Error\");\r\n      }\r\n    }\r\n  }\r\n);\r\n"
+      - gatewayscript:
+          version: 2.0.0
+          title: Build Response
+          source: "// Build Response Headers\r\nlet outputHeaders = {\r\n    \"Content-Type\":
+            \"application/json\",\r\n    \"x-request-id\": context.get('requestId')\r\n}\r\n\r\ncontext.clear('message.headers');\r\ncontext.set('message.headers',
+            outputHeaders);\r\n\r\n// Build Response Body\r\nlet errorInfo = context.get('error');
+            \r\nlet errorCode = context.get('mappedErrorCode');\r\nlet errorMessage
+            = context.get('mappedErrorMessage');\r\nlet errorPath = context.get('mappedPath');\r\n\r\nif
+            (errorMessage == null || errorMessage == '' || errorMessage == undefined)
+            {\r\n\terrorMessage = errorInfo.message;\r\n}\r\n\r\nlet response = {};\r\n\r\nlet
+            Errors = [\r\n    {\r\n        \"Code\": errorCode,\r\n        \"Message\":
+            errorMessage,\r\n        \"Url\": \"https://portal-www.apic1012.ejada.com\"\r\n
+            \   }\r\n]\r\n\r\nif (!!errorPath) Errors[0].Path = errorPath;\r\n\r\nresponse.Errors
+            = Errors;\r\n\r\ncontext.set('message.body', response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\nlet
+            httpCode = context.get('message.status.code');\r\n\r\nFramework.FWLogError(httpCode);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - MissingApplicationError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Error Mapping
+          source: "// Set Response Status\rcontext.set('message.status.code', 400);\rcontext.set('message.status.reason',
+            'Bad Request');\r\r// Build Response Headers\rlet outputHeaders = {\r
+            \   \"Content-Type\": \"application/json\",\r    \"x-request-id\": context.get('requestId')\r};\rcontext.clear('message.headers');\rcontext.set('message.headers',
+            outputHeaders);\r\r// Build Response Body\rlet response = {};\rlet exception
+            = context.get('error');\rlet Errors = [\r    {\r        \"Code\": \"NTSP.ERROR.400.001\",\r
+            \        \"Message\": exception,\r         \"Url\": \"https://portal-www.apic1012.ejada.com\"\r
+            \   }\r];\r\rresponse.Errors = Errors;\r\rcontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Build Response
+          source: "// Build Response Headers\r\nlet outputHeaders = {\r\n    \"Content-Type\":
+            \"application/json\",\r\n    \"x-request-id\": context.get('requestId')\r\n}\r\n\r\ncontext.clear('message.headers');\r\ncontext.set('message.headers',
+            outputHeaders);\r\n\r\n// Build Response Body\r\nlet errorInfo = context.get('error');
+            \r\nlet errorCode = context.get('mappedErrorCode');\r\nlet errorMessage
+            = context.get('mappedErrorMessage');\r\nlet errorPath = context.get('mappedPath');\r\n\r\nif
+            (errorMessage == null || errorMessage == '' || errorMessage == undefined)
+            {\r\n\terrorMessage = errorInfo.message;\r\n}\r\n\r\nlet response = {};\r\n\r\nlet
+            Errors = [\r\n    {\r\n        \"Code\": errorCode,\r\n        \"Message\":
+            errorMessage,\r\n        \"Url\": \"https://portal-www.apic1012.ejada.com\"\r\n
+            \   }\r\n]\r\n\r\nif (!!errorPath) Errors[0].Path = errorPath;\r\n\r\nresponse.Errors
+            = Errors;\r\n\r\ncontext.set('message.body', response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\nlet
+            httpCode = context.get('message.status.code');\r\n\r\nFramework.FWLogError(httpCode);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - UnauthorizedError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build response
+          source: "// Set Response Status\rcontext.set('message.status.code', 401);\rcontext.set('message.status.reason',
+            'Unauthorized');\r\r// Build Response Headers\rlet outputHeaders = {\r
+            \   \"Content-Type\": \"application/json\",\r    \"x-request-id\": context.get('requestId')\r}\r\rcontext.clear('message.headers');\rcontext.set('message.headers',
+            outputHeaders);\r\r// Build Response Body\rlet response = {};\rlet exception
+            = context.get('error');\rlet Errors = [\r    {\r        \"Code\": \"NTSP.ERROR.401.001\",\r
+            \       \"Message\": exception.message,\r        \"Path\": \"authorization\",\r
+            \       \"Url\": \"https://portal-www.apic1012.ejada.com\"\r    }\r]\r\rresponse.Errors
+            = Errors;\r\rcontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(401);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - ForbiddenError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build response
+          source: "// Set Response Status\rcontext.set('message.status.code', 403);\rcontext.set('message.status.reason',
+            'Forbidden');\r\r// Build Response Headers\rlet outputHeaders = {\r    \"Content-Type\":
+            \"application/json\",\r    \"x-request-id\": context.get('requestId')\r}\r\rcontext.clear('message.headers');\rcontext.set('message.headers',
+            outputHeaders);\r\r// Build Response Body\rlet response = {};\rlet exception
+            = context.get('error');\rlet Errors = [\r    {\r        \"Code\": \"NTSP.ERROR.403.001\",\r
+            \       \"Message\": exception.message,\r        \"Url\": \"https://portal-www.apic1012.ejada.com\"\r
+            \   }\r]\r\rresponse.Errors = Errors;\r\rcontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(403);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - AssemblyRateLimitError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build response
+          source: "// Set Response Status\rcontext.set('message.status.code', 429);\rcontext.set('message.status.reason',
+            'Too Many Requests');\r\r// Build Response Headers\rlet outputHeaders
+            = {\r    \"Content-Type\": \"application/json\",\r    \"x-request-id\":
+            context.get('requestId')\r}\r\rcontext.clear('message.headers');\rcontext.set('message.headers',
+            outputHeaders);\r\r// Build Response Body\rlet response = {};\rlet Errors
+            = [\r    {\r        \"Code\": \"NTSP.ERROR.429.001\",\r        \"Message\":
+            \"Assembly Rate Limit exceeded\",\r        \"Url\": \"https://portal-www.apic1012.ejada.com\"\r
+            \   }\r]\r\rresponse.Errors = Errors;\r\rcontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(429);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - errors:
+      - BadRequestError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build response
+          source: "// Set Response Status\rcontext.set('message.status.code', 400);\rcontext.set('message.status.reason',
+            'Bad Request');\r\r// Build Response Headers\rlet outputHeaders = {\r
+            \   \"Content-Type\": \"application/json\",\r    \"x-request-id\": context.get('requestId')\r}\r\rcontext.clear('message.headers');\rcontext.set('message.headers',
+            outputHeaders);\r\r// Build Response Body\rlet response = {};\rlet exception
+            = context.get('error');\rlet Errors = [\r    {\r        \"Code\": \"NTSP.ERROR.400.080\",\r
+            \       \"Message\": exception.message,\r        \"Url\": \"https://portal-www.apic1012.ejada.com\"\r
+            \   }\r]\r\rresponse.Errors = Errors;\r\rcontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(400);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+    - default:
+      - gatewayscript:
+          version: 2.0.0
+          title: Build response
+          source: "// Set Response Status\rcontext.set('message.status.code', 500);\rcontext.set('message.status.reason',
+            'Internal Server Error');\r\r// Build Response Headers\rlet outputHeaders
+            = {\r    \"Content-Type\": \"application/json\",\r    \"x-request-id\":
+            context.get('requestId')\r}\r\rcontext.clear('message.headers');\rcontext.set('message.headers',
+            outputHeaders);\r\r// Build Response Body\rlet response = {};\rlet exception
+            = context.get('error');\rlet Errors = [\r    {\r        \"Code\": \"NTSP.ERROR.500.001\",\r
+            \        \"Message\": exception,\r         \"Url\": \"https://portal-www.apic1012.ejada.com\"\r
+            \   }\r];\r\rresponse.Errors = Errors;\r\rcontext.set('message.body',response);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log Error
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\nFramework.FWLogError(500);"
+      - gatewayscript:
+          version: 2.0.0
+          title: Log RPLY
+          source: "let Framework = require('local:/FRAMEWORK/FUNCTIONS/FRAMEWORK_FUNCTIONS.js');\r\n\r\n
+            Framework.FWLogReply();"
+  properties:
+    target-url:
+      value: https://ob-data-repository-app-vaps-uat.apps.nt.uat.oke.neotek.sa/api/v1/
+      description: The URL of the target service
+      encoded: false
+    sponsored-tpp-url:
+      value: https://darahim-ob-data-repository-app-vaps-uat.apps.nt.uat.oke.neotek.sa/open-banking/auth/v1/sponsored-tpp-id
+      description: The URL to get sponsored tpp id
+      encoded: false
+  activity-log:
+    enabled: true
+    success-content: activity
+    error-content: payload
+  catalogs:
+    neotek-sandbox:
+      properties:
+        target-url: https://darahim-ob-data-repository-app-vaps-uat.apps.nt.uat.oke.neotek.sa/api/v1/
+        sponsored-tpp-url: https://darahim-auth-gw-app-vaps-uat.apps.nt.uat.oke.neotek.sa/open-banking/auth/v1/sponsored-tpp-id
+    neotek:
+      properties:
+        target-url: https://darahim-ob-data-repository-app-vaps-prod.apps.nt.prd.oke.neotek.sa/api/v1/
+        sponsored-tpp-url: https://darahim-auth-gw-app-vaps-prod.apps.nt.prd.oke.neotek.sa/open-banking/auth/v1/sponsored-tpp-id
+    neotek-dev:
+      properties:
+        target-url: https://darahim-ob-data-repository-app-vaps-dev.apps.nt.dev.oke.neotek.sa/api/v1/
+        sponsored-tpp-url: https://darahim-auth-gw-app-vaps-dev.apps.nt.dev.oke.neotek.sa/open-banking/auth/v1/sponsored-tpp-id
+    neotek-sit:
+      properties:
+        target-url: https://darahim-ob-data-repository-app-vaps-uat.apps.nt.uat.oke.neotek.sa/api/v1/
+        sponsored-tpp-url: https://darahim-auth-gw-app-vaps-uat.apps.nt.uat.oke.neotek.sa/open-banking/auth/v1/sponsored-tpp-id
+
