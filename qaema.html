@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Qaema Business — Platform Announcement</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body{background:#EDEFF1;padding:24px 0}
+  .page{margin:0 auto 22px;border-radius:14px;box-shadow:0 10px 30px -12px rgba(0,0,0,.18)}
+
+  /* wordmark for Qaema (no asset available) */
+  .wordmark{display:flex;align-items:baseline;gap:7px;font-weight:800;letter-spacing:-.5px}
+  .wordmark .q{font-size:22px;color:var(--orange1)}
+  .wordmark .b{font-size:22px;color:var(--ink)}
+  .footer .wordmark .q{color:#fff}
+  .footer .wordmark .b{color:#CED4DA}
+
+  /* ---- banks ---- */
+  .banks{display:flex;gap:16px;margin:6px 0 4px}
+  .bank{flex:1;display:flex;align-items:center;gap:14px;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .bank .bic{width:46px;height:46px;border-radius:12px;flex:none;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-weight:800;font-size:15px;
+    background:linear-gradient(135deg,var(--green),#099268);box-shadow:0 8px 16px -8px rgba(12,166,120,.6)}
+  .bank .nm{font-size:15px;font-weight:800;color:var(--ink)}
+  .bank .ar{direction:rtl;font-size:13px;color:var(--muted);margin-top:2px}
+
+  /* ---- features grid ---- */
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .feat{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);
+    border-radius:13px;padding:13px 14px}
+  .feat .ic{width:38px;height:38px;border-radius:10px;flex:none;display:flex;align-items:center;
+    justify-content:center;font-size:18px;background:var(--orange-soft);border:1px solid #FFE3CC}
+  .feat .en{font-size:13px;font-weight:800;color:var(--ink);line-height:1.2}
+  .feat .ar{direction:rtl;font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* ---- team grid (7 members) ---- */
+  .team-grid .row{flex-wrap:wrap;gap:18px 0;justify-content:center}
+  .team-grid .member{flex:0 0 25%;max-width:25%}
+  .team-grid .rail{display:none}
+</style>
+</head>
+<body>
+
+<div class="page"><div class="inner">
+
+  <!-- ===== top bar ===== -->
+  <div class="topbar">
+    <div class="brand">
+      <span class="wordmark"><span class="q">Qaema</span><span class="b">Business</span></span>
+    </div>
+    <div class="topright">
+      <span class="now-live"><span class="dot live"></span> NOW LIVE</span>
+      <span class="sub">PMO Announcement</span>
+    </div>
+  </div>
+
+  <!-- ===== hero ===== -->
+  <div class="hero">
+    <div class="eyebrow">B2B BANKING PLATFORM</div>
+    <h1>&#128640; Qaema Business</h1>
+    <div class="kicker">UNIFIED DIGITAL BUSINESS PLATFORM</div>
+    <div class="ar">منصة رقمية موحدة تمكّن الشركات من إدارة خدماتها المالية والتشغيلية عبر التكامل المباشر مع البنوك</div>
+    <div class="en">A unified platform to manage banking-enabled B2B services through seamless integration with partner banks</div>
+  </div>
+
+  <!-- ===== meta ===== -->
+  <div class="meta">
+    <span class="date">Monday, 22 June <span class="yr">2026</span> <span class="ar">الاثنين، 22 يونيو <span class="yr">2026</span></span></span>
+    <span class="status"><span class="dot"></span> LIVE IN PRODUCTION</span>
+  </div>
+
+  <!-- ===== intro paragraphs ===== -->
+  <p class="para-ar">يسرّ مكتب إدارة المشاريع الإعلان عن إطلاق <b>Qaema Business</b>، منصة رقمية موحدة تمكّن الشركات من إدارة خدماتها المالية والتشغيلية من خلال التكامل المباشر مع البنوك، لتوفير تجربة أكثر سرعة وكفاءة وسهولة. تجمع المنصة أهم خدمات الأعمال (B2B) في مكان واحد، مما يساعد الشركات على تنفيذ المدفوعات، وإدارة المستخدمين والصلاحيات، ومتابعة العمليات، وإتمام الموافقات، مع ربط مباشر بالبنوك الشريكة.</p>
+
+  <p class="para-en">We are excited to introduce <b>Qaema Business</b>, a unified digital platform that enables businesses to access and manage banking-enabled B2B services through seamless integration with partner banks. Designed to simplify business financial operations, it provides a centralized platform to manage payments, users, approvals, reconciliation, and day-to-day business activities through a secure and intuitive experience.</p>
+
+  <!-- ===== banks ===== -->
+  <div class="sec-head"><span class="l"></span><span class="t">CURRENTLY AVAILABLE BANKS <span class="ar">البنوك المتوفرة حالياً</span></span><span class="l"></span></div>
+  <div class="banks">
+    <div class="bank">
+      <div class="bic">ANB</div>
+      <div><div class="nm">Arab National Bank</div><div class="ar">البنك العربي الوطني</div></div>
+    </div>
+    <div class="bank">
+      <div class="bic">RAJ</div>
+      <div><div class="nm">Al Rajhi Bank</div><div class="ar">مصرف الراجحي</div></div>
+    </div>
+  </div>
+
+  <!-- ===== features ===== -->
+  <div class="sec-head"><span class="l"></span><span class="t">KEY FEATURES <span class="ar">الخدمات المتوفرة</span></span><span class="l"></span></div>
+  <div class="features">
+    <div class="feat"><span class="ic">&#128184;</span><div><div class="en">Single Payout</div><div class="ar">التحويلات الفردية</div></div></div>
+    <div class="feat"><span class="ic">&#128230;</span><div><div class="en">Bulk Payout</div><div class="ar">التحويلات الجماعية</div></div></div>
+    <div class="feat"><span class="ic">&#128101;</span><div><div class="en">User &amp; Role Management</div><div class="ar">إدارة المستخدمين والصلاحيات</div></div></div>
+    <div class="feat"><span class="ic">&#128202;</span><div><div class="en">Interactive Dashboard</div><div class="ar">لوحة تحكم تفاعلية</div></div></div>
+    <div class="feat"><span class="ic">&#127968;</span><div><div class="en">Landing Page</div><div class="ar">الصفحة الرئيسية</div></div></div>
+    <div class="feat"><span class="ic">&#128100;</span><div><div class="en">Beneficiary Management</div><div class="ar">إدارة المستفيدين</div></div></div>
+    <div class="feat"><span class="ic">&#128196;</span><div><div class="en">Transaction List</div><div class="ar">سجل العمليات</div></div></div>
+    <div class="feat"><span class="ic">&#128640;</span><div><div class="en">Company Onboarding</div><div class="ar">تسجيل الشركات الجديدة</div></div></div>
+    <div class="feat"><span class="ic">&#127974;</span><div><div class="en">Bank Reconciliation</div><div class="ar">التسويات البنكية</div></div></div>
+    <div class="feat"><span class="ic">&#9989;</span><div><div class="en">Workflow Approvals</div><div class="ar">إدارة مسارات الموافقات</div></div></div>
+    <div class="feat"><span class="ic">&#9881;&#65039;</span><div><div class="en">Company Settings</div><div class="ar">إعدادات الشركة</div></div></div>
+  </div>
+
+  <!-- ===== closing note ===== -->
+  <p class="para-ar" style="margin-top:22px">ونواصل العمل على توسيع المنصة بإضافة المزيد من البنوك والخدمات لتوفير تجربة أعمال رقمية متكاملة تلبي احتياجات مختلف القطاعات.</p>
+  <p class="para-en">Qaema Business will continue to evolve by onboarding additional banking partners and introducing new capabilities, delivering a comprehensive and scalable digital experience for businesses.</p>
+
+  <!-- ===== button ===== -->
+  <div class="btn-wrap">
+    <a class="btn" href="https://www.qaema.com/">
+      <span class="arrow">&#8599;</span>
+      <span>Visit Qaema Business</span>
+      <span class="sep">&ndash;</span>
+      <span class="ar">زيارة منصة قائمة للأعمال</span>
+    </a>
+  </div>
+
+  <!-- ===== team ===== -->
+  <div class="sec-head"><span class="l"></span><span class="t">PROJECT TEAM <span class="ar">فريق المشروع</span></span><span class="l"></span></div>
+  <div class="team team-grid">
+    <div class="rail"></div>
+    <div class="row">
+      <div class="member"><div class="av">AA</div><div class="nm">Abdulaziz M. Almogbel</div><div class="rl">Developer</div><div class="ar">التطوير</div></div>
+      <div class="member"><div class="av">MM</div><div class="nm">Mohammed Makki</div><div class="rl">Developer</div><div class="ar">التطوير</div></div>
+      <div class="member"><div class="av">AH</div><div class="nm">Ahmed M. Hegazy</div><div class="rl">Product Manager</div><div class="ar">مدير المنتج</div></div>
+      <div class="member"><div class="av">GG</div><div class="nm">Ghulam M. Ghazali</div><div class="rl">Product Manager</div><div class="ar">مدير المنتج</div></div>
+      <div class="member"><div class="av">JR</div><div class="nm">John Refaat</div><div class="rl">Project Manager</div><div class="ar">مدير المشروع</div></div>
+      <div class="member"><div class="av">SA</div><div class="nm">Safiah S. Aljohani</div><div class="rl">Business Developer</div><div class="ar">تطوير الأعمال</div></div>
+      <div class="member"><div class="av">HA</div><div class="nm">Hassan A. Almushaiqah</div><div class="rl">Business Developer</div><div class="ar">تطوير الأعمال</div></div>
+      <div class="member"><div class="av">NA</div><div class="nm">Naif M. Alkaltham</div><div class="rl">Cyber Security Engineer</div><div class="ar">أمن المعلومات</div></div>
+    </div>
+  </div>
+
+  <!-- ===== tagline ===== -->
+  <div class="tagline">
+    <div class="en" style="font-size:18px;font-weight:800;color:var(--green)">All Your Finances and Payments. One Dashboard.</div>
+    <div class="ar" style="font-size:14px;font-weight:600;color:var(--muted);margin-top:6px">كل مدفوعاتك وحوالاتك في مكان واحد</div>
+  </div>
+
+  <!-- ===== footer ===== -->
+  <div class="footer">
+    <div class="brand" style="justify-content:center;margin-bottom:12px">
+      <span class="wordmark"><span class="q">Qaema</span><span class="b">Business</span></span>
+    </div>
+    <div class="ar">صُنع بـ &#10084;&#65039; من قِبل مكتب إدارة المشاريع (PMO)</div>
+    <div class="en">NeoTek &middot; PMO &middot; Qaema Business Programme</div>
+  </div>
+
+</div></div>
+</body>
+</html>
