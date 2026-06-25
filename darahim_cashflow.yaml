@@ -1,0 +1,281 @@
+---
+openapi: 3.1.0
+info:
+  title: Drahim Cashflow Report API
+  version: 0.1.0
+security:
+  - OAuth2: []
+paths:
+  "/neotek/reports/cashflow":
+    get:
+      tags:
+        - neotek
+      summary: Cashflow Report
+      operationId: cashflow_report_neotek_reports_cashflow_get
+      parameters:
+        - "$ref": "#/components/parameters/SponsoredTppId"
+        - "$ref": "#/components/parameters/PsuIdRequired"
+        - "$ref": "#/components/parameters/FromDateRequired"
+        - "$ref": "#/components/parameters/ToDateRequired"
+        - "$ref": "#/components/parameters/AccountId"
+        - "$ref": "#/components/parameters/FinancialInstitutionId"
+        - "$ref": "#/components/parameters/ClientId"
+        - "$ref": "#/components/parameters/ClientSecret"
+      responses:
+        "200":
+          "$ref": "#/components/responses/CashflowReportSuccess"
+        "422":
+          "$ref": "#/components/responses/ValidationError"
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/authorize
+          tokenUrl: /oauth/token
+          scopes: {}
+  parameters:
+    SponsoredTppId:
+      name: sponsored_tpp_id
+      in: query
+      required: true
+      schema:
+        type: string
+        title: Sponsored Tpp Id
+    PsuIdRequired:
+      name: psu_id
+      in: query
+      required: true
+      schema:
+        type: string
+        title: Psu Id
+    FromDateRequired:
+      name: from_date
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date-time
+        title: From Date
+    ToDateRequired:
+      name: to_date
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date-time
+        title: To Date
+    AccountId:
+      name: account_id
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+        default: []
+        title: Account Id
+    FinancialInstitutionId:
+      name: financial_institution_id
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - "$ref": "#/components/schemas/FinancialInstitutionIdEnum"
+          - type: "null"
+        title: Financial Institution Id
+    ClientId:
+      name: client-id
+      in: header
+      required: false
+      schema:
+        anyOf:
+          - type: string
+          - type: "null"
+        title: Client-Id
+    ClientSecret:
+      name: client-secret
+      in: header
+      required: false
+      schema:
+        anyOf:
+          - type: string
+          - type: "null"
+        title: Client-Secret
+  responses:
+    CashflowReportSuccess:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/CashFlowReportResponse"
+    ValidationError:
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/HTTPValidationError"
+  schemas:
+    FinancialInstitutionIdEnum:
+      type: string
+      enum:
+        - BSFRSARI
+        - INMASARI
+        - ARNBSARI
+        - SAIBCSARI
+        - RIBLSARI
+        - GULFSARI
+        - BJAZSAJE
+        - SABBSARI
+        - RJHISARI
+        - NCBKSAJE
+        - ALBISARI
+        - OBLAB
+      title: FinancialInstitutionIdEnum
+    CashFlowReportResponse:
+      type: object
+      title: CashFlowReportResponse
+      required:
+        - period
+        - cashflow_summary
+        - cashflow_movements
+        - outflow_by_category
+        - inflow_by_category
+      properties:
+        period:
+          "$ref": "#/components/schemas/Period"
+        currency:
+          type: string
+          title: Currency
+          default: SAR
+        cashflow_summary:
+          "$ref": "#/components/schemas/CashflowSummary"
+        cashflow_movements:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CashflowMovement"
+          title: Cashflow Movements
+        outflow_by_category:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CashflowByCategory"
+          title: Outflow By Category
+        inflow_by_category:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CashflowByCategory"
+          title: Inflow By Category
+    Period:
+      type: object
+      title: Period
+      required:
+        - from_date
+        - to_date
+      properties:
+        from_date:
+          type: string
+          format: date
+          title: From Date
+        to_date:
+          type: string
+          format: date
+          title: To Date
+    CashflowSummary:
+      type: object
+      title: CashflowSummary
+      required:
+        - total_inflow_amount
+        - total_outflow_amount
+        - cashflow_amount
+      properties:
+        total_inflow_amount:
+          type: number
+          title: Total Inflow Amount
+        total_outflow_amount:
+          type: number
+          title: Total Outflow Amount
+        cashflow_amount:
+          type: number
+          title: Cashflow Amount
+    CashflowMovement:
+      type: object
+      title: CashflowMovement
+      required:
+        - date
+        - inflow
+        - outflow
+        - closing_balance
+      properties:
+        date:
+          type: string
+          format: date
+          title: Date
+        inflow:
+          type: number
+          title: Inflow
+        outflow:
+          type: number
+          title: Outflow
+        closing_balance:
+          type: number
+          title: Closing Balance
+    CashflowByCategory:
+      type: object
+      title: CashflowByCategory
+      required:
+        - category_code
+        - category_name
+        - amount
+      properties:
+        category_code:
+          type: string
+          title: Category Code
+        category_name:
+          "$ref": "#/components/schemas/Label"
+        amount:
+          type: number
+          title: Amount
+    Label:
+      type: object
+      title: Label
+      required:
+        - ar
+        - en
+      properties:
+        ar:
+          type: string
+          title: Ar
+        en:
+          type: string
+          title: En
+    HTTPValidationError:
+      type: object
+      title: HTTPValidationError
+      properties:
+        detail:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ValidationError"
+          title: Detail
+    ValidationError:
+      type: object
+      title: ValidationError
+      required:
+        - loc
+        - msg
+        - type
+      properties:
+        loc:
+          type: array
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
