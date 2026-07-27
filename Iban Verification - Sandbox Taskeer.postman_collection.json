@@ -1,0 +1,208 @@
+{
+  "info": {
+    "_postman_id": "ebcefbcf-6e0c-4cd5-bafc-585a4220da4e",
+    "name": "Iban Verification - Sandbox Taskeer",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "Iban Verification",
+      "item": [
+        {
+          "name": "Token Management",
+          "item": [
+            {
+              "name": "Generate Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var data = JSON.parse(responseBody);\r",
+                      "pm.collectionVariables.set(\"access-token\", data.access_token);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "grant_type",
+                      "value": "client_credentials",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_secret",
+                      "value": "",
+                      "type": "text"
+                    },
+                    {
+                      "key": "scope",
+                      "value": "iban_verification",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://test.api.neotek.sa/oauth2security/oauth2/token",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "oauth2security",
+                    "oauth2",
+                    "token"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Iban Verification Swift Sync",
+          "item": [
+            {
+              "name": "ARB",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access-token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-request-id",
+                    "value": "10062024T0426",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://test.api.neotek.sa/iban/v1/verify-with-swift?POIType=NAT&POINum=1523698745&IBAN=SA4180000204608019865462",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "iban",
+                    "v1",
+                    "verify-with-swift"
+                  ],
+                  "query": [
+                    {
+                      "key": "POIType",
+                      "value": "NAT"
+                    },
+                    {
+                      "key": "POINum",
+                      "value": "1523698745"
+                    },
+                    {
+                      "key": "IBAN",
+                      "value": "SA4180000204608019865462"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi Payment",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access-token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-request-id",
+                    "value": "10062024T0426",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://test.api.neotek.sa/iban/v1/verify-with-swift?POIType=NAT&POINum=1523698745&IBAN=SA4130000204608019865462",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "iban",
+                    "v1",
+                    "verify-with-swift"
+                  ],
+                  "query": [
+                    {
+                      "key": "POIType",
+                      "value": "NAT"
+                    },
+                    {
+                      "key": "POINum",
+                      "value": "1523698745"
+                    },
+                    {
+                      "key": "IBAN",
+                      "value": "SA4130000204608019865462"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "access-token",
+      "value": ""
+    },
+    {
+      "key": "access-token-basic",
+      "value": ""
+    }
+  ]
+}

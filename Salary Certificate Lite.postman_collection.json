@@ -1,0 +1,1069 @@
+{
+  "info": {
+    "_postman_id": "e8183414-3106-43ea-ab6c-ed4302e73d07",
+    "name": "Salary Certificate Lite",
+    "description": "**Base URL:** `/salary-certificate-lite/v1`**Auth:** OAuth2 Client Credentials — scope: `social_insurance`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47466382",
+    "_collection_link": "https://go.postman.co/collection/47466382-e8183414-3106-43ea-ab6c-ed4302e73d07?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Generate Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var data = JSON.parse(responseBody);\r",
+              "pm.collectionVariables.set(\"access-token\", data.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "{{client_id}}",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "{{client_secret}}",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "social_insurance",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/oauth2security/oauth2/token",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "oauth2security",
+            "oauth2",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Person Salary Certificate - Non-Gov Sector",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-request-id",
+            "value": "{{$guid}}",
+            "description": "An RFC4122 UID used as a correlation id."
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Include-Inactive",
+            "value": "false",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/salary-certificate-lite/v1/persons/:POINumber?EmploymentSector=Non-Gov&POIType=NAT",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "salary-certificate-lite",
+            "v1",
+            "persons",
+            ":POINumber"
+          ],
+          "query": [
+            {
+              "key": "EmploymentSector",
+              "value": "Non-Gov",
+              "description": "(Required) Indicates the person's employment sector.\n<br> Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR)\n<br> Non-Gov: Data will be retrived from Masdr Private Salary Certificate (GOSI) \n<br> Semi-Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR) & if no records were found, Data will be retrived from Masdr Private Salary Certificate (GOSI)"
+            },
+            {
+              "key": "POIType",
+              "value": "NAT"
+            }
+          ],
+          "variable": [
+            {
+              "key": "POINumber",
+              "value": "1000002321",
+              "description": "(Required) National ID Number or Iqama ID."
+            }
+          ]
+        },
+        "description": "Person Salary Certificate"
+      },
+      "response": [
+        {
+          "name": "Get Person Salary Certificate - Non-Gov Sector",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-request-id",
+                "value": "<string>",
+                "description": "An RFC4122 UID used as a correlation id.",
+                "disabled": true
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Include-Inactive",
+                "value": "false",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "https://sit.api.neotek.sa/salary-certificate-lite/v1/persons/:POINumber?EmploymentSector=Non-Gov&POIType=NAT",
+              "protocol": "https",
+              "host": [
+                "sit",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "salary-certificate-lite",
+                "v1",
+                "persons",
+                ":POINumber"
+              ],
+              "query": [
+                {
+                  "key": "EmploymentSector",
+                  "value": "Non-Gov",
+                  "description": "(Required) Indicates the person's employment sector.\n<br> Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR)\n<br> Non-Gov: Data will be retrived from Masdr Private Salary Certificate (GOSI) \n<br> Semi-Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR) & if no records were found, Data will be retrived from Masdr Private Salary Certificate (GOSI)"
+                },
+                {
+                  "key": "POIType",
+                  "value": "NAT"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "POINumber",
+                  "value": "1000002321",
+                  "description": "(Required) National ID Number or Iqama ID."
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 29 Apr 2026 07:53:15 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache"
+            },
+            {
+              "key": "client-app-name",
+              "value": "test-app"
+            },
+            {
+              "key": "X-Global-Transaction-ID",
+              "value": "092ce31369f1b8ea0077afd2"
+            },
+            {
+              "key": "X-RateLimit-Limit",
+              "value": "name=gold,50000;"
+            },
+            {
+              "key": "X-RateLimit-Remaining",
+              "value": "name=gold,49993;"
+            },
+            {
+              "key": "x-request-id",
+              "value": "757dcfce-d790-cf0c-2446-b67c299b2c14"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=315360001"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"Data\": {\n        \"EmploymentInfo\": {\n            \"JobList\": [\n                {\n                    \"Status\": \"نشيط\",\n                    \"EmployerName\": \"مؤسسة الكبار  التجارية(انشطة)\",\n                    \"WorkingMonths\": \"124\",\n                    \"SalaryStartingDate\": \"01/01/2021\",\n                    \"BasicWage\": 3000,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": \"تقديم خدمات تسويقية نيابةً عن الغير (731013)\",\n                    \"Source\": \"GOSI\",\n                    \"JoiningDateGreg\": \"01/07/2013\"\n                },\n                {\n                    \"Status\": \"نشيط\",\n                    \"EmployerName\": \"مؤسسة محمد\",\n                    \"WorkingMonths\": \"124\",\n                    \"SalaryStartingDate\": \"01/01/2021\",\n                    \"BasicWage\": 26000,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": \"تقديم خدمات تسويقية نيابةً عن الغير (731013)\",\n                    \"Source\": \"GOSI\",\n                    \"JoiningDateGreg\": \"01/07/2013\"\n                },\n                {\n                    \"Status\": \"غير نشيط\",\n                    \"EmployerName\": \"مؤسسة علي\",\n                    \"WorkingMonths\": \"124\",\n                    \"SalaryStartingDate\": \"01/09/2023\",\n                    \"BasicWage\": 12000,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": \"الأنشطة العامة للإدارة العامة  (الوزارات)\",\n                    \"Source\": \"GOSI\",\n                    \"JoiningDateGreg\": \"01/07/2013\"\n                },\n                {\n                    \"Status\": \"Private Pension\",\n                    \"EmployerName\": \"GOSI\",\n                    \"WorkingMonths\": \"0\",\n                    \"SalaryStartingDate\": \"NA\",\n                    \"BasicWage\": 18061.77,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": 1001,\n                    \"Source\": \"GOSI\",\n                    \"JoiningDateGreg\": \"04/01/2022\"\n                },\n                {\n                    \"Status\": \"Public Pension\",\n                    \"EmployerName\": \"GOSI\",\n                    \"WorkingMonths\": \"0\",\n                    \"SalaryStartingDate\": \"NA\",\n                    \"BasicWage\": 18340.31,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": \"NA\",\n                    \"Source\": \"GOSI\",\n                    \"JoiningDateGreg\": \"01/07/2013\"\n                }\n            ]\n        }\n    }\n}"
+        },
+        {
+          "name": "Get Person Salary Certificate - Non-Gov Sector",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-request-id",
+                "value": "<string>",
+                "description": "An RFC4122 UID used as a correlation id.",
+                "disabled": true
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Include-Inactive",
+                "value": "false",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "https://sit.api.neotek.sa/salary-certificate-lite/v1/persons/:POINumber?EmploymentSector=Non-Gov&POIType=NAT",
+              "protocol": "https",
+              "host": [
+                "sit",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "salary-certificate-lite",
+                "v1",
+                "persons",
+                ":POINumber"
+              ],
+              "query": [
+                {
+                  "key": "EmploymentSector",
+                  "value": "Non-Gov",
+                  "description": "(Required) Indicates the person's employment sector.\n<br> Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR)\n<br> Non-Gov: Data will be retrived from Masdr Private Salary Certificate (GOSI) \n<br> Semi-Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR) & if no records were found, Data will be retrived from Masdr Private Salary Certificate (GOSI)"
+                },
+                {
+                  "key": "POIType",
+                  "value": "NAT"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "POINumber",
+                  "value": "1010101000",
+                  "description": "(Required) National ID Number or Iqama ID."
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 29 Apr 2026 07:42:05 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache"
+            },
+            {
+              "key": "client-app-name",
+              "value": "test-app"
+            },
+            {
+              "key": "X-Global-Transaction-ID",
+              "value": "092ce31369f1b64c0077a9e2"
+            },
+            {
+              "key": "X-RateLimit-Limit",
+              "value": "name=gold,50000;"
+            },
+            {
+              "key": "X-RateLimit-Remaining",
+              "value": "name=gold,49995;"
+            },
+            {
+              "key": "x-request-id",
+              "value": "010b9faf-9a52-1abe-c00d-2af51df2328d"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=315360001"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=99"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"Data\": {\n        \"EmploymentInfo\": {\n            \"JobList\": [\n                {\n                    \"Status\": \"غير نشيط\",\n                    \"EmployerName\": \"مؤسسة الكبار  التجارية(انشطة)\",\n                    \"WorkingMonths\": \"124\",\n                    \"SalaryStartingDate\": \"01/09/2023\",\n                    \"BasicWage\": 25000,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": \"تقديم خدمات تسويقية نيابةً عن الغير (731013)\",\n                    \"Source\": \"GOSI\",\n                    \"JoiningDateGreg\": \"01/07/2013\"\n                }\n            ]\n        }\n    }\n}"
+        },
+        {
+          "name": "Get Person Salary Certificate - Non-Gov Sector Private Pension",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-request-id",
+                "value": "<string>",
+                "description": "An RFC4122 UID used as a correlation id.",
+                "disabled": true
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Include-Inactive",
+                "value": "false",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "https://sit.api.neotek.sa/salary-certificate-lite/v1/persons/:POINumber?EmploymentSector=Non-Gov&POIType=NAT",
+              "protocol": "https",
+              "host": [
+                "sit",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "salary-certificate-lite",
+                "v1",
+                "persons",
+                ":POINumber"
+              ],
+              "query": [
+                {
+                  "key": "EmploymentSector",
+                  "value": "Non-Gov",
+                  "description": "(Required) Indicates the person's employment sector.\n<br> Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR)\n<br> Non-Gov: Data will be retrived from Masdr Private Salary Certificate (GOSI) \n<br> Semi-Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR) & if no records were found, Data will be retrived from Masdr Private Salary Certificate (GOSI)"
+                },
+                {
+                  "key": "POIType",
+                  "value": "NAT"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "POINumber",
+                  "value": "1123456713",
+                  "description": "(Required) National ID Number or Iqama ID."
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 29 Apr 2026 07:42:49 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache"
+            },
+            {
+              "key": "client-app-name",
+              "value": "test-app"
+            },
+            {
+              "key": "X-Global-Transaction-ID",
+              "value": "092ce31369f1b6780077aae2"
+            },
+            {
+              "key": "X-RateLimit-Limit",
+              "value": "name=gold,50000;"
+            },
+            {
+              "key": "X-RateLimit-Remaining",
+              "value": "name=gold,49994;"
+            },
+            {
+              "key": "x-request-id",
+              "value": "0dff1c3c-ff17-a732-c194-121f24a2a5f2"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=315360001"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"Data\": {\n        \"EmploymentInfo\": {\n            \"JobList\": [\n                {\n                    \"Status\": \"Private Pension\",\n                    \"EmployerName\": \"GOSI\",\n                    \"WorkingMonths\": \"0\",\n                    \"SalaryStartingDate\": \"NA\",\n                    \"BasicWage\": 18061.77,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": 1003,\n                    \"Source\": \"GOSI\",\n                    \"JoiningDateGreg\": \"04/01/2022\"\n                }\n            ]\n        }\n    }\n}"
+        },
+        {
+          "name": "Get Person Salary Certificate - Non-Gov Sector",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-request-id",
+                "value": "{{$guid}}",
+                "description": "An RFC4122 UID used as a correlation id."
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Include-Inactive",
+                "value": "false",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://sit.api.neotek.sa/salary-certificate-lite/v1/persons/:POINumber?EmploymentSector=Non-Gov&POIType=IQA",
+              "protocol": "https",
+              "host": [
+                "sit",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "salary-certificate-lite",
+                "v1",
+                "persons",
+                ":POINumber"
+              ],
+              "query": [
+                {
+                  "key": "EmploymentSector",
+                  "value": "Non-Gov",
+                  "description": "(Required) Indicates the person's employment sector.\n<br> Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR)\n<br> Non-Gov: Data will be retrived from Masdr Private Salary Certificate (GOSI) \n<br> Semi-Gov: Data will be retrived from Masdr Government Salary Certificate (NCGR) & if no records were found, Data will be retrived from Masdr Private Salary Certificate (GOSI)"
+                },
+                {
+                  "key": "POIType",
+                  "value": "IQA"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "POINumber",
+                  "value": "1000002321",
+                  "description": "(Required) National ID Number or Iqama ID."
+                }
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Thu, 30 Apr 2026 12:01:51 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache"
+            },
+            {
+              "key": "client-app-name",
+              "value": "test-app"
+            },
+            {
+              "key": "X-Global-Transaction-ID",
+              "value": "092ce31369f344af0078bab2"
+            },
+            {
+              "key": "X-RateLimit-Limit",
+              "value": "name=gold,50000;"
+            },
+            {
+              "key": "X-RateLimit-Remaining",
+              "value": "name=gold,49999;"
+            },
+            {
+              "key": "x-request-id",
+              "value": "1b0b3fd8-c501-471b-ab55-7c1a9a809133"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=315360001"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"Errors\": [\n        {\n            \"Code\": \"NTSP.ERROR.400.090\",\n            \"Message\": \"POIType and POINumber are not compatible\",\n            \"Url\": \"https://api.neotek.sa\"\n        }\n    ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Person Salary Certificate - Semi-Gov Sector",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-request-id",
+            "value": "{{$guid}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/salary-certificate-lite/v1/persons/:POINumber?POIType=NAT&BirthDate=1989-08-12&BirthDateType=Greg&EmploymentSector=Semi-Gov",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "salary-certificate-lite",
+            "v1",
+            "persons",
+            ":POINumber"
+          ],
+          "query": [
+            {
+              "key": "POIType",
+              "value": "NAT"
+            },
+            {
+              "key": "BirthDate",
+              "value": "1989-08-12"
+            },
+            {
+              "key": "BirthDateType",
+              "value": "Greg"
+            },
+            {
+              "key": "EmploymentSector",
+              "value": "Semi-Gov"
+            }
+          ],
+          "variable": [
+            {
+              "key": "POINumber",
+              "value": "1186897433"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Get Person Salary Certificate - Semi-Gov Sector",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-request-id",
+                "value": "{{$guid}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://sit.api.neotek.sa/salary-certificate-lite/v1/persons/:POINumber?POIType=NAT&BirthDate=1989-08-12&BirthDateType=Greg&EmploymentSector=Semi-Gov",
+              "protocol": "https",
+              "host": [
+                "sit",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "salary-certificate-lite",
+                "v1",
+                "persons",
+                ":POINumber"
+              ],
+              "query": [
+                {
+                  "key": "POIType",
+                  "value": "NAT"
+                },
+                {
+                  "key": "BirthDate",
+                  "value": "1989-08-12"
+                },
+                {
+                  "key": "BirthDateType",
+                  "value": "Greg"
+                },
+                {
+                  "key": "EmploymentSector",
+                  "value": "Semi-Gov"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "POINumber",
+                  "value": "1186897433"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 29 Apr 2026 07:55:35 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache"
+            },
+            {
+              "key": "client-app-name",
+              "value": "test-app"
+            },
+            {
+              "key": "X-Global-Transaction-ID",
+              "value": "092ce31369f1b977005b7d60"
+            },
+            {
+              "key": "X-RateLimit-Limit",
+              "value": "name=gold,50000;"
+            },
+            {
+              "key": "X-RateLimit-Remaining",
+              "value": "name=gold,49990;"
+            },
+            {
+              "key": "x-request-id",
+              "value": "a04d891a-db5b-49fa-bbe2-54bd312c7109"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=315360001"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"Data\": {\n        \"PersonalInfo\": {\n            \"FullNameAr\": \" عبدالله علي وهج\"\n        },\n        \"EmploymentInfo\": {\n            \"JobList\": [\n                {\n                    \"Source\": \"NCGR\",\n                    \"EmployerInfo\": {\n                        \"GovAgencyCode\": \"022001000003\",\n                        \"Name\": \"مدينة الملك فهد الطبية\"\n                    },\n                    \"Status\": \"ACTIVE\",\n                    \"JoiningDateGreg\": \"1999-04-20\",\n                    \"GovJobTitle\": \"محلل نظم\",\n                    \"JobNumber\": \"165\",\n                    \"BankAccountInfo\": {\n                        \"IBAN\": \"SA9080000621608010080389\",\n                        \"BankCode\": \"RJHI\",\n                        \"BankName\": \"مصرف الراجحي\"\n                    },\n                    \"SalaryInfo\": {\n                        \"PayslipInfo\": {\n                            \"PayMonthGreg\": \"2022-09\",\n                            \"BasicSalary\": 7000,\n                            \"NetSalary\": 8540,\n                            \"TotalAllowances\": 1540,\n                            \"TotalDeductions\": 0\n                        }\n                    }\n                },\n                {\n                    \"Source\": \"GOSI\",\n                    \"Status\": \"Public Pension\",\n                    \"EmployerName\": \"GOSI\",\n                    \"WorkingMonths\": \"0\",\n                    \"JoiningDateGreg\": \"01/07/2013\",\n                    \"SalaryStartingDate\": \"NA\",\n                    \"BasicWage\": 18340.31,\n                    \"HousingAllowance\": 0,\n                    \"OtherAllowance\": 0,\n                    \"EstablishmentActivity\": \"NA\"\n                }\n            ]\n        }\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Person Salary Certificate - Gov Sector",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-request-id",
+            "value": "<string>"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "••••••"
+          },
+          {
+            "key": "Cookie",
+            "value": "698d02abb73c2f90fd0965bdc7ad520f=e2978a68e0dac129c1bfff9078965ad4"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/salary-certificate-lite/v1/persons/:POINumber?POIType=NAT&EmploymentSector=Gov&BirthDate=1989-08-12&BirthDateType=Greg",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "salary-certificate-lite",
+            "v1",
+            "persons",
+            ":POINumber"
+          ],
+          "query": [
+            {
+              "key": "POIType",
+              "value": "NAT",
+              "description": "(Required) Indicates the type of POI Number, whether National ID Number or Iqama ID."
+            },
+            {
+              "key": "EmploymentSector",
+              "value": "Gov"
+            },
+            {
+              "key": "BirthDate",
+              "value": "1989-08-12",
+              "description": "Employee Gregorian Birth Date. (Required in case of government sector, accept birthDate in Hijri or birthDate in Gregorian)"
+            },
+            {
+              "key": "BirthDateType",
+              "value": "Greg",
+              "description": "Birth Date Type (Required in case of government sector)"
+            }
+          ],
+          "variable": [
+            {
+              "key": "POINumber",
+              "value": "1186897433"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Get Person Salary Certificate - Gov Sector",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-request-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "••••••"
+              },
+              {
+                "key": "Cookie",
+                "value": "698d02abb73c2f90fd0965bdc7ad520f=e2978a68e0dac129c1bfff9078965ad4"
+              }
+            ],
+            "url": {
+              "raw": "https://sit.api.neotek.sa/salary-certificate-lite/v1/persons/:POINumber?POIType=NAT&EmploymentSector=Gov&BirthDate=1989-08-12&BirthDateType=Greg",
+              "protocol": "https",
+              "host": [
+                "sit",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "salary-certificate-lite",
+                "v1",
+                "persons",
+                ":POINumber"
+              ],
+              "query": [
+                {
+                  "key": "POIType",
+                  "value": "NAT",
+                  "description": "(Required) Indicates the type of POI Number, whether National ID Number or Iqama ID."
+                },
+                {
+                  "key": "EmploymentSector",
+                  "value": "Gov"
+                },
+                {
+                  "key": "BirthDate",
+                  "value": "1989-08-12",
+                  "description": "Employee Gregorian Birth Date. (Required in case of government sector, accept birthDate in Hijri or birthDate in Gregorian)"
+                },
+                {
+                  "key": "BirthDateType",
+                  "value": "Greg",
+                  "description": "Birth Date Type (Required in case of government sector)"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "POINumber",
+                  "value": "1186897433"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 29 Apr 2026 07:56:21 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache"
+            },
+            {
+              "key": "client-app-name",
+              "value": "test-app"
+            },
+            {
+              "key": "X-Global-Transaction-ID",
+              "value": "092ce31369f1b9a50077b1d2"
+            },
+            {
+              "key": "X-RateLimit-Limit",
+              "value": "name=gold,50000;"
+            },
+            {
+              "key": "X-RateLimit-Remaining",
+              "value": "name=gold,49989;"
+            },
+            {
+              "key": "x-request-id",
+              "value": "<string>"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=315360001"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"Data\": {\n        \"EmploymentInfo\": {\n            \"JobList\": [\n                {\n                    \"EmployerInfo\": {\n                        \"GovAgencyCode\": \"022001000003\",\n                        \"Name\": \"مدينة الملك فهد الطبية\"\n                    },\n                    \"BankAccountInfo\": {\n                        \"IBAN\": \"SA9080000621608010080389\",\n                        \"BankCode\": \"RJHI\",\n                        \"BankName\": \"مصرف الراجحي\"\n                    },\n                    \"SalaryInfo\": {\n                        \"PayslipInfo\": {\n                            \"NetSalary\": 8540,\n                            \"TotalDeductions\": 0,\n                            \"BasicSalary\": 7000,\n                            \"TotalAllowances\": 1540,\n                            \"PayMonthGreg\": \"2022-09\"\n                        }\n                    },\n                    \"GovJobTitle\": \"محلل نظم\",\n                    \"JobNumber\": \"165\",\n                    \"Status\": \"ACTIVE\",\n                    \"Source\": \"NCGR\",\n                    \"JoiningDateGreg\": \"1999-04-20\"\n                }\n            ]\n        },\n        \"PersonalInfo\": {\n            \"FullNameAr\": \" عبدالله علي وهج\"\n        }\n    }\n}"
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://test.api.neotek.sa"
+    },
+    {
+      "key": "access-token",
+      "value": ""
+    },
+    {
+      "key": "client_id",
+      "value": "03506a98-080b-458a-b0fc-675d4a9749f7"
+    },
+    {
+      "key": "client_secret",
+      "value": "bd3ac6a6-5a4f-405d-be5c-d84c12324a0d"
+    }
+  ]
+}

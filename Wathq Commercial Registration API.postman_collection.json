@@ -1,0 +1,344 @@
+{
+  "info": {
+    "_postman_id": "32903a49-32a8-425d-8d13-1e23669b7480",
+    "name": "Wathq Commercial Registration API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "Commercial Registration",
+      "item": [
+        {
+          "name": "Generate Token SIT Copy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = JSON.parse(responseBody);\r",
+                  "pm.collectionVariables.set(\"access-token\", data.access_token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "7624a4b84e4db3e62a79a753a17cc5cb",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "client_secret",
+                  "value": "13cd39b20f192e52adec9fdf3bc841ad",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "client_id",
+                  "value": "8ffc48ea-ace5-4458-99f4-784fa019f764",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "c1f799f2-43d4-42dc-b83c-3c3fe844a816",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "wathq",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://sit.api.neotek.sa/auth/token",
+              "protocol": "https",
+              "host": [
+                "sit",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "auth",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieves all commercial registration data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "sub-client",
+                "value": "aaaa"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "x-request-id",
+                "value": "test0191",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/fullinfo/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fullinfo",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "ar",
+                  "description": "Commercial registration information language - لغة بيانات السجل التجاري",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "7001406813",
+                  "description": "Commercial Registration National Number - الرقم الوطني الموحد للسجل التجاري\n     **ملاحظة:** يتم البحث برقم السجل التجاري للسجلات التجارية المشطوبة فقط\n"
+                }
+              ]
+            },
+            "description": "Retrieves all commercial registration data such as dates, status, activities, parties and others (refer to model) - الاستعلام عن كافة بيانات السجل التجاري"
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieves basic commercial registration data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "sub-client",
+                "value": "Identifire to the client"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/info/:id?language=en",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "info",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "en",
+                  "description": "Commercial registration information language - لغة بيانات السجل التجاري"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "7001406813",
+                  "description": "Commercial Registration National Number - الرقم الوطني الموحد للسجل التجاري\n     **ملاحظة:** يتم البحث برقم السجل التجاري للسجلات التجارية المشطوبة فقط\n"
+                }
+              ]
+            },
+            "description": "Retrieves basic commercial registration data such as dates, status, activities and others (refer to model) - الاستعلام عن البيانات الاساسية"
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieves a list of managers and board of directors if any",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "sub-client",
+                "value": "Identifire to the client"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/managers/:id?language=ar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "managers",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "ar",
+                  "description": "Commercial registration information language - لغة بيانات السجل التجاري"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "7001406813",
+                  "description": "Commercial Registration National Number - الرقم الوطني الموحد للسجل التجاري\n     **ملاحظة:** يتم البحث برقم السجل التجاري للسجلات التجارية المشطوبة فقط\n"
+                }
+              ]
+            },
+            "description": "Retrieves a list of managers and board of directors if any - الاستعلام عن المدراء وأعضاء مجلس الإدارة إن وجد للسجل التجاري"
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieves the owner of establishment and a list of partners with their shares for companies",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "sub-client",
+                "value": "Identifire to the client"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/owners/:id?language=ar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "owners",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "ar",
+                  "description": "Commercial registration information language - لغة بيانات السجل التجاري"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "7001406813",
+                  "description": "Commercial Registration National Number - الرقم الوطني الموحد للسجل التجاري\n     **ملاحظة:** يتم البحث برقم السجل التجاري للسجلات التجارية المشطوبة فقط\n"
+                }
+              ]
+            },
+            "description": "Retrieves the owner of establishment and a list of partners with their shares for companies - الاستعلام عن الملاك والشركاء ونسبة حصصهم"
+          },
+          "response": []
+        }
+      ],
+      "description": " "
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "scope",
+        "value": "wathq",
+        "type": "string"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "{baseURL}/oauth2security/oauth2/token",
+        "type": "string"
+      },
+      {
+        "key": "grant_type",
+        "value": "client_credentials",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://sit.api.neotek.sa/wathq/v1"
+    },
+    {
+      "key": "access-token",
+      "value": ""
+    }
+  ]
+}

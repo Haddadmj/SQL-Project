@@ -1,0 +1,313 @@
+{
+  "info": {
+    "_postman_id": "ddbc5104-96af-41d4-800e-a81e74d5b890",
+    "name": "Iban Verification Advnaced - Sandbox - Alrajhi Takaful",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "Iban Verification",
+      "item": [
+        {
+          "name": "Token Management",
+          "item": [
+            {
+              "name": "Generate Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var data = JSON.parse(responseBody);\r",
+                      "pm.collectionVariables.set(\"access-token\", data.access_token);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "grant_type",
+                      "value": "client_credentials",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "6e943011-abd7-4a99-bd5d-4f17af10d455",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_secret",
+                      "value": "458f75e0-3185-46b7-a8ea-78dc1a701d2a",
+                      "type": "text"
+                    },
+                    {
+                      "key": "scope",
+                      "value": "iban_verification",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://test.api.neotek.sa/oauth2security/oauth2/token",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "oauth2security",
+                    "oauth2",
+                    "token"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Iban Verification Sync",
+          "item": [
+            {
+              "name": "ARB",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access-token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-request-id",
+                    "value": "82d28b89-4a0c-4c74-8f71-fd52853cb58d",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://test.api.neotek.sa/iban/v1/verify?POIType=NAT&IBAN=SA4180000204608019865462&POINum=1523698745",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "iban",
+                    "v1",
+                    "verify"
+                  ],
+                  "query": [
+                    {
+                      "key": "POIType",
+                      "value": "NAT"
+                    },
+                    {
+                      "key": "IBAN",
+                      "value": "SA4180000204608019865462"
+                    },
+                    {
+                      "key": "POINum",
+                      "value": "1523698745"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi Payment",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access-token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-request-id",
+                    "value": "10062024T0426",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://test.api.neotek.sa/iban/v1/verify?POIType=NAT&POINum=1523698745&IBAN=SA4130000204608019865462",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "iban",
+                    "v1",
+                    "verify"
+                  ],
+                  "query": [
+                    {
+                      "key": "POIType",
+                      "value": "NAT"
+                    },
+                    {
+                      "key": "POINum",
+                      "value": "1523698745"
+                    },
+                    {
+                      "key": "IBAN",
+                      "value": "SA4130000204608019865462"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Iban Verification Async",
+          "item": [
+            {
+              "name": "ARB",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access-token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-request-id",
+                    "value": "10062024T0426",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"Data\": {\r\n        \"Source\": \"ARB\",\r\n        \"IBAN\": \"SA0880000319608010475362\",\r\n        \"POIType\": \"IQA\",\r\n        \"POINumber\": \"2459579732\",\r\n        \"Meta\": {\r\n            \"EchoList\": [\r\n                {\r\n                    \"Name\": \"channelRedirectionUrl\",\r\n                    \"Value\": \"https://www.example.com\"\r\n                }\r\n            ]\r\n        }\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://test.api.neotek.sa/iban-verification-neotek/v1/verification-requests",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "iban-verification-neotek",
+                    "v1",
+                    "verification-requests"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi Payment",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access-token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-request-id",
+                    "value": "10062024T0426",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"Data\": {\r\n    \"Source\": \"Saudi-Payment\",\r\n    \"IBAN\": \"SA2230000108071086000028\",\r\n    \"POIType\": \"NAT\",\r\n    \"POINumber\": \"1369874521\",\r\n    \"Meta\": {\r\n      \"EchoList\": [\r\n        {\r\n          \"Name\": \"channelRedirectionUrl\",\r\n          \"Value\": \"https://www.example.com\"\r\n        }\r\n      ]\r\n    }\r\n  }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://test.api.neotek.sa/iban-verification-neotek/v1/verification-requests",
+                  "protocol": "https",
+                  "host": [
+                    "test",
+                    "api",
+                    "neotek",
+                    "sa"
+                  ],
+                  "path": [
+                    "iban-verification-neotek",
+                    "v1",
+                    "verification-requests"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "access-token",
+      "value": ""
+    },
+    {
+      "key": "access-token-basic",
+      "value": ""
+    },
+    {
+      "key": "basic-access-token",
+      "value": ""
+    }
+  ]
+}

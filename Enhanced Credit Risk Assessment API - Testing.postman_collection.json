@@ -1,0 +1,981 @@
+{
+  "info": {
+    "_postman_id": "d771b372-b859-43e7-967a-bc49cb91b07c",
+    "name": "Enhanced Credit Risk Assessment API - Testing",
+    "description": "API for generating credit risk assessment reports based on Open Banking transaction data.\n\n**Features:**\n- Credit score calculation (0-1000 scale)\n- Rating classification (AAA to D)\n- Financial metrics analysis\n- Purpose/affordability assessment\n- PDF report generation (5-page and 8-page versions)\n\n**Currency:** SAR (Saudi Riyal) by default\n\n\nContact Support:\n Name: Neotek Development Team\n Email: dev@neotek.sa",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "Generate Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var data = JSON.parse(responseBody);\r",
+              "pm.collectionVariables.set(\"access-token\", data.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "pplplp",
+            "value": "nhn",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "8ffc48ea-ace5-4458-99f4-784fa019f764",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "c1f799f2-43d4-42dc-b83c-3c3fe844a816",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "credit_risk_assessment single_api",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://test.api.neotek.sa/auth/token",
+          "protocol": "https",
+          "host": [
+            "test",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "auth",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Accounts Link",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = JSON.parse(responseBody);\r",
+              "pm.collectionVariables.set(\"AccountsLinkId\", jsonData.Data.AccountsLinkId);\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let raw = pm.collectionVariables.get(\"Id\");\r",
+              "let current = parseInt(raw, 10) || 0;\r",
+              "let next = current + 1;\r",
+              "\r",
+              "// Pad the number to be at least 3 characters long with leading zeros\r",
+              "let paddedId = next.toString().padStart(3, '0');\r",
+              "\r",
+              "pm.collectionVariables.set(\"Id\", next.toString());\r",
+              "pm.collectionVariables.set(\"PSUId\", `acctest${paddedId}`);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "••••••",
+            "disabled": true
+          },
+          {
+            "key": "Cookie",
+            "value": "dtCookiepm8zsa2s=v_4_srv_1_sn_6C8EBCEB0274D8F211076E946DA91CFA_perc_100000_ol_0_mul_1_app-3Aea7c4b59f27d43eb_1; dtCookieprg5e9w5=v_4_srv_2_sn_6122FB2841FCFD4A5914A499C3640CF4_perc_100000_ol_0_mul_1_app-3Aea7c4b59f27d43eb_1",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"Data\": {\n        \"PSUId\": \"{{PSUId}}\",\n        \"FinancialInstitutionId\": \"SAIBCSARI\",\n        \"SecurityProfile\": \"Redirection\",\n        // \"ExpirationDateTime\": \"2026-03-11T13:10:00.000Z\",\n        \"DataGroups\": [\n            {\n                \"DataGroupId\": \"AccountDetails\",\n                \"Permissions\": [\n                    \"ReadAccountsBasic\",\n                    \"ReadAccountsDetail\",\n                    \"ReadBalances\"\n                ]\n            },\n            {\n                \"DataGroupId\": \"AccountTransactions\",\n                \"Permissions\": [\n                    \"ReadTransactionsCredits\",\n                    \"ReadTransactionsDebits\",\n                    \"ReadTransactionsBasic\",\n                    \"ReadTransactionsDetail\"\n                ]\n            },\n            {\n                \"DataGroupId\": \"PartyDetails\",\n                \"Permissions\": [\n                    \"ReadParty\",\n                    \"ReadPartyPSUIdentity\",\n                    \"ReadPartyPSU\"\n                ]\n            }\n        ],\n        \"AccountTypesList\": [\n            \"KSAOB.Retail\"\n        ],\n        \"PurposeList\": [\n            \"Account Aggregation\"\n        ]\n        // ,\n        // \"UseCases\": [\n        //     \"account_insights\"\n        // ]\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://test.api.neotek.sa/accounts-information/v1/accounts-links",
+          "protocol": "https",
+          "host": [
+            "test",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "accounts-information",
+            "v1",
+            "accounts-links"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Accounts Links",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-request-id",
+            "value": "a873defb-0e5b-426f-ab73-9564a267c654"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer AAIgZDkwNWI1OTEyY2RjNmMwNjZiNjY3MmViOTQ2ZjE4Zjb8x4vzzJwuixl4J_EE_z5fzUDDuGkgO_RL8RXySp3CuiVuVQBOCoCJ4Cx4HU-xJXrKuKial3VkkFB6nRFYvwYal_8eiWIW7DcGJdjYtxorAF0Xn8qrEG9lGVspPy4N0Go"
+          },
+          {
+            "key": "Cookie",
+            "value": "dtCookieprg5e9w5=v_4_srv_2_sn_D2D70C909EAE0C44C8C972A5F5B25646_perc_100000_ol_0_mul_1_app-3Aea7c4b59f27d43eb_1"
+          }
+        ],
+        "url": {
+          "raw": "https://test.api.neotek.sa/accounts-information/v1/accounts-links?PSUId={{PSUId}}",
+          "protocol": "https",
+          "host": [
+            "test",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "accounts-information",
+            "v1",
+            "accounts-links"
+          ],
+          "query": [
+            {
+              "key": "PSUId",
+              "value": "{{PSUId}}"
+            },
+            {
+              "key": "FinancialInstitutionId",
+              "value": "SAIBCSARI",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ListProfileTransactions Copy 2",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://test.api.neotek.sa/single-api-aggregator/v1/profiles/transactions?PSUId={{PSUId}}",
+          "protocol": "https",
+          "host": [
+            "test",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "single-api-aggregator",
+            "v1",
+            "profiles",
+            "transactions"
+          ],
+          "query": [
+            {
+              "key": "FinancialInstitutionId",
+              "value": "INMASARI",
+              "disabled": true
+            },
+            {
+              "key": "AccountsLinkId",
+              "value": "266379797213670562962669398691",
+              "disabled": true
+            },
+            {
+              "key": "AccountId",
+              "value": "100004000000000000000003",
+              "disabled": true
+            },
+            {
+              "key": "TransactionType",
+              "value": "KSAOB.ECommerce",
+              "disabled": true
+            },
+            {
+              "key": "TransactionSubType",
+              "value": "KSAOB.DepositReversal",
+              "disabled": true
+            },
+            {
+              "key": "TransactionFlags",
+              "value": "KSAOB.StandingOrder",
+              "disabled": true
+            },
+            {
+              "key": "PaymentMode",
+              "value": "KSAOB.Online",
+              "disabled": true
+            },
+            {
+              "key": "TransactionAmountType",
+              "value": "KSAOB.Credit",
+              "disabled": true
+            },
+            {
+              "key": "Status",
+              "value": "KSAOB.Booked",
+              "disabled": true
+            },
+            {
+              "key": "TransactionMutability",
+              "value": "KSAOB.Mutable",
+              "disabled": true
+            },
+            {
+              "key": "FromBookingDate",
+              "value": "2017-01-02T02:00:00.000%2B02:00",
+              "disabled": true
+            },
+            {
+              "key": "ToBookingDate",
+              "value": "2017-01-20T02:00:00.000%2B02:00",
+              "disabled": true
+            },
+            {
+              "key": "FromAmount",
+              "value": "0",
+              "disabled": true
+            },
+            {
+              "key": "ToAmount",
+              "value": "30",
+              "disabled": true
+            },
+            {
+              "key": "Currency",
+              "value": "SAR",
+              "disabled": true
+            },
+            {
+              "key": "MerchantName",
+              "value": "merchantName",
+              "disabled": true
+            },
+            {
+              "key": "CardSchemeName",
+              "value": "KSAOB.AmericanExpress",
+              "disabled": true
+            },
+            {
+              "key": "InstrumentType",
+              "value": "KSAOB.ApplePay",
+              "disabled": true
+            },
+            {
+              "key": "Page",
+              "value": "2",
+              "disabled": true
+            },
+            {
+              "key": "Order",
+              "value": "",
+              "disabled": true
+            },
+            {
+              "key": "FinancialInstitutionName",
+              "value": "2",
+              "disabled": true
+            },
+            {
+              "key": "AccountId",
+              "value": "ACC-990",
+              "disabled": true
+            },
+            {
+              "key": "FromBookingDate",
+              "value": "2024-03-16T00:00:00Z",
+              "disabled": true
+            },
+            {
+              "key": "ToBookingDate",
+              "value": "2024-04-16T00:00:00Z",
+              "disabled": true
+            },
+            {
+              "key": "PSUId",
+              "value": "{{PSUId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Generate Credit Risk Report (JSON)",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"psuId\": \"{{PSUId}}\",\n  \"accountLinkId\": \"{{AccountsLinkId}}\",\n  \"accountId\": \"{{accountId}}\",\n  \"customerType\": \"RETAIL\"\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/credit-risk/getCreditRiskReport",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "credit-risk",
+            "getCreditRiskReport"
+          ]
+        },
+        "description": "Generates a comprehensive credit risk assessment report based on the customer's \nOpen Banking transaction data. Returns detailed JSON response with score breakdown,\nfinancial metrics, and recommendations.\n"
+      },
+      "response": []
+    },
+    {
+      "name": "Generate Credit Risk Report (JSON) FULL",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"psuId\": \"{{PSUId}}\",\n  \"accountLinkId\": \"{{AccountsLinkId}}\",\n  \"accountId\": \"{{accountId}}\",\n  \"customerType\": \"RETAIL\",\n  \"purpose\": \"PERSONAL_FINANCE\",\n  \"requestedAmount\": 50000,\n  \"loanTermMonths\": 36,\n  \"annualInterestRate\": 3,\n  \"age\": 35,\n  \"riskFactors\": [\n    {\n      \"factorType\": \"AGE\",\n      \"weight\": 150,\n      \"ranges\": [\n        {\n          \"minValue\": 0,\n          \"maxValue\": 0.2,\n          \"points\": 90,\n          \"label\": \"Excellent\"\n        }\n      ],\n      \"enabled\": true\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/credit-risk/getCreditRiskReport",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "credit-risk",
+            "getCreditRiskReport"
+          ]
+        },
+        "description": "Generates a comprehensive credit risk assessment report based on the customer's \nOpen Banking transaction data. Returns detailed JSON response with score breakdown,\nfinancial metrics, and recommendations.\n"
+      },
+      "response": []
+    },
+    {
+      "name": "Generate Credit Risk Report (PDF - 5 pages)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/pdf",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"psuId\": \"{{PSUId}}\",\n  \"accountLinkId\": \"{{AccountsLinkId}}\",\n  \"accountId\": \"{{accountId}}\",\n  \"customerType\": \"RETAIL\"\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/credit-risk/getCreditRiskReport/pdf",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "credit-risk",
+            "getCreditRiskReport",
+            "pdf"
+          ]
+        },
+        "description": "Generates a 5-page PDF credit risk report with:\n- Page 1: Executive Summary\n- Page 2: Credit Score Component Breakdown\n- Page 3: Financial Health Indicators\n- Page 4: Transaction Analysis\n- Page 5: Loan Exposure & Final Recommendation\n"
+      },
+      "response": []
+    },
+    {
+      "name": "Generate Credit Risk Report (PDF - 5 pages) - Full Request",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/pdf",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"psuId\": \"{{PSUId}}\",\n  \"accountLinkId\": \"{{AccountsLinkId}}\",\n  \"accountId\": \"{{accountId}}\",\n  \"customerType\": \"RETAIL\",\n  \"purpose\": \"PERSONAL_FINANCE\",\n  \"requestedAmount\": 50000,\n  \"loanTermMonths\": 36,\n  \"annualInterestRate\": 3,\n  \"age\": 35,\n  \"riskFactors\": [\n    {\n      \"factorType\": \"AGE\",\n      \"weight\": 150,\n      \"ranges\": [\n        {\n          \"minValue\": 0,\n          \"maxValue\": 0.2,\n          \"points\": 90,\n          \"label\": \"Excellent\"\n        }\n      ],\n      \"enabled\": true\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/credit-risk/getCreditRiskReport/pdf",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "credit-risk",
+            "getCreditRiskReport",
+            "pdf"
+          ]
+        },
+        "description": "Generates a 5-page PDF credit risk report with:\n- Page 1: Executive Summary\n- Page 2: Credit Score Component Breakdown\n- Page 3: Financial Health Indicators\n- Page 4: Transaction Analysis\n- Page 5: Loan Exposure & Final Recommendation\n"
+      },
+      "response": []
+    },
+    {
+      "name": "Generate Credit Risk Report (PDF V2 - 8 pages)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"psuId\": \"{{PSUId}}\",\n  \"accountLinkId\": \"{{AccountsLinkId}}\",\n  \"accountId\": \"{{accountId}}\",\n  \"customerType\": \"RETAIL\"\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/credit-risk/getCreditRiskReport/v2/pdf",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "credit-risk",
+            "getCreditRiskReport",
+            "v2",
+            "pdf"
+          ]
+        },
+        "description": "Generates an enhanced 8-page PDF credit risk report with:\n- Page 1: Executive Summary\n- Page 2: Credit Score Component Breakdown\n- Page 3: Financial Health Indicators\n- Page 4: Transaction Analysis\n- Page 5: Loan Exposure & Debt Profile\n- Page 6: Behavior Analysis\n- Page 7: Monthly Breakdown\n- Page 8: Final Recommendation (with Purpose Assessment)\n"
+      },
+      "response": []
+    },
+    {
+      "name": "Generate Credit Risk Report (PDF V2 - 8 pages) - Full Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"psuId\": \"{{PSUId}}\",\n  \"accountLinkId\": \"{{AccountsLinkId}}\",\n  \"accountId\": \"{{accountId}}\",\n  \"customerType\": \"RETAIL\",\n  \"purpose\": \"PERSONAL_FINANCE\",\n  \"requestedAmount\": 50000,\n  \"loanTermMonths\": 36,\n  \"annualInterestRate\": 3,\n  \"age\": 35\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/credit-risk/getCreditRiskReport/v2/pdf",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "credit-risk",
+            "getCreditRiskReport",
+            "v2",
+            "pdf"
+          ]
+        },
+        "description": "Generates an enhanced 8-page PDF credit risk report with:\n- Page 1: Executive Summary\n- Page 2: Credit Score Component Breakdown\n- Page 3: Financial Health Indicators\n- Page 4: Transaction Analysis\n- Page 5: Loan Exposure & Debt Profile\n- Page 6: Behavior Analysis\n- Page 7: Monthly Breakdown\n- Page 8: Final Recommendation (with Purpose Assessment)\n"
+      },
+      "response": []
+    },
+    {
+      "name": "ListProfileAccounts Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://test.api.neotek.sa/single-api-aggregator/v1/profiles/accounts?PSUId={{PSUId}}&IncludeBalancesFlag=true",
+          "protocol": "https",
+          "host": [
+            "test",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "single-api-aggregator",
+            "v1",
+            "profiles",
+            "accounts"
+          ],
+          "query": [
+            {
+              "key": "PSUId",
+              "value": "{{PSUId}}"
+            },
+            {
+              "key": "ProfileId",
+              "value": "",
+              "disabled": true
+            },
+            {
+              "key": "FinancialInstitutionId",
+              "value": "INMASARI",
+              "disabled": true
+            },
+            {
+              "key": "AccountsLinkId",
+              "value": "266379797213670562962669398691",
+              "disabled": true
+            },
+            {
+              "key": "AccountId",
+              "value": "100004000000000000000003",
+              "disabled": true
+            },
+            {
+              "key": "IncludeBalancesFlag",
+              "value": "true"
+            },
+            {
+              "key": "BalanceType",
+              "value": "InterimAvailable",
+              "disabled": true
+            },
+            {
+              "key": "AccountType",
+              "value": "KSAOB.Retail",
+              "disabled": true
+            },
+            {
+              "key": "AccountSubType",
+              "value": "CurrentAccount",
+              "disabled": true
+            },
+            {
+              "key": "FromOpeningDate",
+              "value": "2022-04-28T23:09:53.684Z",
+              "disabled": true
+            },
+            {
+              "key": "ToOpeningDate",
+              "value": "2022-04-28T23:09:56.684Z",
+              "disabled": true
+            },
+            {
+              "key": "Page",
+              "value": "",
+              "disabled": true
+            },
+            {
+              "key": "Order",
+              "value": "InterimAvailable",
+              "disabled": true
+            },
+            {
+              "key": "FinancialInstitutionName",
+              "value": "s",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "ListProfileAccounts",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://test.api.neotek.sa/single-api-aggregator/v1/profiles/accounts?PSUId={{PSUId}}&IncludeBalancesFlag=true",
+              "protocol": "https",
+              "host": [
+                "test",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "single-api-aggregator",
+                "v1",
+                "profiles",
+                "accounts"
+              ],
+              "query": [
+                {
+                  "key": "PSUId",
+                  "value": "{{PSUId}}"
+                },
+                {
+                  "key": "ProfileId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "FinancialInstitutionId",
+                  "value": "INMASARI",
+                  "disabled": true
+                },
+                {
+                  "key": "AccountsLinkId",
+                  "value": "266379797213670562962669398691",
+                  "disabled": true
+                },
+                {
+                  "key": "AccountId",
+                  "value": "100004000000000000000003",
+                  "disabled": true
+                },
+                {
+                  "key": "IncludeBalancesFlag",
+                  "value": "true"
+                },
+                {
+                  "key": "BalanceType",
+                  "value": "InterimAvailable",
+                  "disabled": true
+                },
+                {
+                  "key": "AccountType",
+                  "value": "KSAOB.Retail",
+                  "disabled": true
+                },
+                {
+                  "key": "AccountSubType",
+                  "value": "CurrentAccount",
+                  "disabled": true
+                },
+                {
+                  "key": "FromOpeningDate",
+                  "value": "2022-04-28T23:09:53.684Z",
+                  "disabled": true
+                },
+                {
+                  "key": "ToOpeningDate",
+                  "value": "2022-04-28T23:09:56.684Z",
+                  "disabled": true
+                },
+                {
+                  "key": "Page",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "Order",
+                  "value": "InterimAvailable",
+                  "disabled": true
+                },
+                {
+                  "key": "FinancialInstitutionName",
+                  "value": "s",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "Text",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Tue, 11 Nov 2025 06:44:55 GMT"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Origin, X-Requested-With, Content-Type, Accept"
+            },
+            {
+              "key": "Access-Control-Max-Age",
+              "value": "3600"
+            },
+            {
+              "key": "client-app-name",
+              "value": "neotek-test-111mBknv8474"
+            },
+            {
+              "key": "X-Global-Transaction-ID",
+              "value": "0521371f6912db6600072ce2"
+            },
+            {
+              "key": "X-RateLimit-Limit",
+              "value": "name=default,100;"
+            },
+            {
+              "key": "X-RateLimit-Remaining",
+              "value": "name=default,99;"
+            },
+            {
+              "key": "x-request-id",
+              "value": "9ba75d76-12a7-4bcc-b7d8-6e918d39185d"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=31536000"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"Data\": {\n        \"Accounts\": [\n            {\n                \"ProfileId\": \"2345587\",\n                \"AccountsLinkId\": \"56\",\n                \"FinancialInstitution\": {\n                    \"FinancialInstitutionId\": \"OBLAB\",\n                    \"NameEn\": \"SAMA Model Bank\",\n                    \"NameAr\": \"البنك المركزي\",\n                    \"Logo\": \"https://api.public.neotek.sa/assets-neotek/financial-institutions/ALBISARI.png\"\n                },\n                \"AccountId\": \"100004000000000000000002\",\n                \"AccountHolderName\": \"Mitsuhirato\",\n                \"AccountHolderShortName\": \"Mitsuhirato\",\n                \"Status\": \"Active\",\n                \"StatusUpdateDateTime\": \"2023-02-01T16:37:00+03:00\",\n                \"Currency\": \"SAR\",\n                \"AccountType\": \"KSAOB.Retail\",\n                \"AccountSubType\": \"CurrentAccount\",\n                \"Description\": \"Account sub-type description\",\n                \"Nickname\": \"Mitsuhirato\",\n                \"OpeningDate\": \"2022-04-08T16:37:00+03:00\",\n                \"MaturityDate\": \"2023-11-29T16:37:00+03:00\",\n                \"AccountIdentifiers\": [\n                    {\n                        \"IdentificationType\": \"KSAOB.IBAN\",\n                        \"Identification\": \"10000109010102\",\n                        \"Name\": \"Luigi International\"\n                    },\n                    {\n                        \"IdentificationType\": \"KSAOB.IBAN\",\n                        \"Identification\": \"10000109010102\",\n                        \"Name\": \"Luigi International\"\n                    }\n                ],\n                \"Servicer\": {\n                    \"IdentificationType\": \"KSAOB.BICFI\",\n                    \"Identification\": \"10000109010101\"\n                },\n                \"Balances\": [\n                    {\n                        \"BalanceType\": \"KSAOB.ClosingAvailable\",\n                        \"Amount\": 1091.7,\n                        \"Currency\": \"SAR\"\n                    }\n                ]\n            },\n            {\n                \"ProfileId\": \"2345587\",\n                \"AccountsLinkId\": \"56\",\n                \"FinancialInstitution\": {\n                    \"FinancialInstitutionId\": \"OBLAB\",\n                    \"NameEn\": \"SAMA Model Bank\",\n                    \"NameAr\": \"البنك المركزي\",\n                    \"Logo\": \"https://api.public.neotek.sa/assets-neotek/financial-institutions/ALBISARI.png\"\n                },\n                \"AccountId\": \"100004000000000000000003\",\n                \"AccountHolderName\": \"Mitsuhirato\",\n                \"AccountHolderShortName\": \"Mitsuhirato\",\n                \"Status\": \"Active\",\n                \"StatusUpdateDateTime\": \"2023-02-01T16:37:00+03:00\",\n                \"Currency\": \"SAR\",\n                \"AccountType\": \"KSAOB.Retail\",\n                \"AccountSubType\": \"CurrentAccount\",\n                \"Description\": \"Account sub-type description\",\n                \"Nickname\": \"Mitsuhirato\",\n                \"OpeningDate\": \"2022-04-08T16:37:00+03:00\",\n                \"MaturityDate\": \"2023-11-29T16:37:00+03:00\",\n                \"AccountIdentifiers\": [\n                    {\n                        \"IdentificationType\": \"KSAOB.IBAN\",\n                        \"Identification\": \"10000109010103\",\n                        \"Name\": \"Mario International\"\n                    },\n                    {\n                        \"IdentificationType\": \"KSAOB.IBAN\",\n                        \"Identification\": \"10000109010103\",\n                        \"Name\": \"Mario International\"\n                    }\n                ],\n                \"Servicer\": {\n                    \"IdentificationType\": \"KSAOB.BICFI\",\n                    \"Identification\": \"10000109010101\"\n                },\n                \"Balances\": [\n                    {\n                        \"BalanceType\": \"KSAOB.ClosingAvailable\",\n                        \"Amount\": 1230,\n                        \"Currency\": \"SAR\"\n                    }\n                ]\n            },\n            {\n                \"ProfileId\": \"2345587\",\n                \"AccountsLinkId\": \"56\",\n                \"FinancialInstitution\": {\n                    \"FinancialInstitutionId\": \"OBLAB\",\n                    \"NameEn\": \"SAMA Model Bank\",\n                    \"NameAr\": \"البنك المركزي\",\n                    \"Logo\": \"https://api.public.neotek.sa/assets-neotek/financial-institutions/ALBISARI.png\"\n                },\n                \"AccountId\": \"100004000000000000000005\",\n                \"AccountHolderName\": \"Mitsuhirato\",\n                \"AccountHolderShortName\": \"Mitsuhirato\",\n                \"Status\": \"Active\",\n                \"StatusUpdateDateTime\": \"2023-02-01T16:37:00+03:00\",\n                \"Currency\": \"SAR\",\n                \"AccountType\": \"KSAOB.Retail\",\n                \"AccountSubType\": \"CurrentAccount\",\n                \"Description\": \"Account sub-type description\",\n                \"Nickname\": \"Mitsuhirato\",\n                \"OpeningDate\": \"2022-04-08T16:37:00+03:00\",\n                \"MaturityDate\": \"2023-11-29T16:37:00+03:00\",\n                \"AccountIdentifiers\": [\n                    {\n                        \"IdentificationType\": \"KSAOB.IBAN\",\n                        \"Identification\": \"10000109010105\",\n                        \"Name\": \"Spectrum\"\n                    }\n                ],\n                \"Servicer\": {\n                    \"IdentificationType\": \"KSAOB.BICFI\",\n                    \"Identification\": \"10000109010101\"\n                },\n                \"Balances\": [\n                    {\n                        \"BalanceType\": \"KSAOB.ClosingAvailable\",\n                        \"Amount\": 1230,\n                        \"Currency\": \"SAR\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"Meta\": {\n        \"PageNumber\": 1,\n        \"TotalPages\": 1\n    }\n}"
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access-token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://test.api.neotek.sa/credit-risk-assessment/v2"
+    },
+    {
+      "key": "access-token",
+      "value": "AAIkOGZmYzQ4ZWEtYWNlNS00NDU4LTk5ZjQtNzg0ZmEwMTlmNzY0dLyL8Lop2JmM_UIU1tj1ZHm63EYaQrGOT4IsAM4psYqshCzaCKoeAsRKElUI0rmD8SjcaXH-XVy2QJKcy7l3reTr5M6spk2xay4Ceum2u4rcsy7KNU5wRgc3ojc0-XMs0HqEGIhLacDfijGWewufwkCzTFKQ62mdBrf3fxPcW48"
+    },
+    {
+      "key": "Id",
+      "value": "313"
+    },
+    {
+      "key": "PSUId",
+      "value": "acctest313"
+    },
+    {
+      "key": "AccountsLinkId",
+      "value": "1221"
+    },
+    {
+      "key": "accountId",
+      "value": "ACC-362"
+    }
+  ]
+}

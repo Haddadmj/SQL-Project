@@ -1,0 +1,253 @@
+{
+  "info": {
+    "_postman_id": "e2175a33-7fad-4bef-89d1-b31666d3fb92",
+    "name": "Freelancer Validation (Production, Public) Test App",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "Generate Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var data = JSON.parse(responseBody);\r",
+              "pm.collectionVariables.set(\"access-token\", data.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "34b4873b8e16942eeafe03f2a9237b75",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "9eab4347a3c0ed15bdf435d5ec32237c",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "freelance_validation",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{Host}}/oauth2security/oauth2/token",
+          "host": [
+            "{{Host}}"
+          ],
+          "path": [
+            "oauth2security",
+            "oauth2",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Check Certificate Status",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"certificateNumber\": \"FL-184706435\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{Host}}/{{BasePath}}/certificate/status",
+          "host": [
+            "{{Host}}"
+          ],
+          "path": [
+            "{{BasePath}}",
+            "certificate",
+            "status"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Verify by National ID",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nationalId\": \"1107454009\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{Host}}/{{BasePath}}/certificate/nin",
+          "host": [
+            "{{Host}}"
+          ],
+          "path": [
+            "{{BasePath}}",
+            "certificate",
+            "nin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Roles",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{Host}}/{{BasePath}}/roles",
+          "host": [
+            "{{Host}}"
+          ],
+          "path": [
+            "{{BasePath}}",
+            "roles"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Categories",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"rolesCode\": \"R003\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{Host}}/{{BasePath}}/categories",
+          "host": [
+            "{{Host}}"
+          ],
+          "path": [
+            "{{BasePath}}",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Specialties",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"categoriesCode\": \"C014\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{Host}}/{{BasePath}}/specialities",
+          "host": [
+            "{{Host}}"
+          ],
+          "path": [
+            "{{BasePath}}",
+            "specialities"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access-token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "Host",
+      "value": "https://api.neotek.sa"
+    },
+    {
+      "key": "BasePath",
+      "value": "/freelance-validation/v1"
+    },
+    {
+      "key": "access-token",
+      "value": ""
+    },
+    {
+      "key": "ClientID",
+      "value": "34b4873b8e16942eeafe03f2a9237b75"
+    },
+    {
+      "key": "ClientSecret",
+      "value": "9eab4347a3c0ed15bdf435d5ec32237c"
+    }
+  ]
+}

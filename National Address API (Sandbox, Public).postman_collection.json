@@ -1,0 +1,344 @@
+{
+  "info": {
+    "_postman_id": "36e080e0-0f50-4f96-b1e4-e48e07fea397",
+    "name": "National Address API (Sandbox, Public)",
+    "description": "API to inquire national addresses from Saudi Post - SPL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "Generate Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var data = JSON.parse(responseBody);\r",
+              "pm.collectionVariables.set(\"access-token\", data.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "{{clientId}}",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "{{clientSecret}}",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "national_address",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{host}}/oauth2security/oauth2/token",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "oauth2security",
+            "oauth2",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Retrieve National Address - NationalID",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "accept-language",
+            "value": "ar",
+            "type": "text"
+          },
+          {
+            "key": "x-request-id",
+            "value": "{{$guid}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json; charset=windows-1256",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{host}}/saudi-post/v1/national-address/:poiNumber?POIType=NationalID&mpResponse=true",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "saudi-post",
+            "v1",
+            "national-address",
+            ":poiNumber"
+          ],
+          "query": [
+            {
+              "key": "POIType",
+              "value": "NationalID"
+            },
+            {
+              "key": "mpResponse",
+              "value": "true"
+            }
+          ],
+          "variable": [
+            {
+              "key": "poiNumber",
+              "value": "1105485096"
+            }
+          ]
+        },
+        "description": "Retrieve the national address for establishments or individuals based on POINumber and POIType."
+      },
+      "response": []
+    },
+    {
+      "name": "Retrieve National Address - Iqama",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "accept-language",
+            "value": "ar",
+            "type": "text"
+          },
+          {
+            "key": "x-request-id",
+            "value": "{{$guid}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json; charset=windows-1256",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{host}}/saudi-post/v1/national-address/:POINumber?POIType=IqamaID&mpResponse=true",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "saudi-post",
+            "v1",
+            "national-address",
+            ":POINumber"
+          ],
+          "query": [
+            {
+              "key": "POIType",
+              "value": "IqamaID"
+            },
+            {
+              "key": "mpResponse",
+              "value": "true"
+            }
+          ],
+          "variable": [
+            {
+              "key": "POINumber",
+              "value": "2216044384"
+            }
+          ]
+        },
+        "description": "Retrieve the national address for establishments or individuals based on POINumber and POIType."
+      },
+      "response": []
+    },
+    {
+      "name": "Retrieve National Address - CR",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "accept-language",
+            "value": "en",
+            "type": "text"
+          },
+          {
+            "key": "x-request-id",
+            "value": "{{$guid}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json; charset=windows-1256",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{host}}/saudi-post/v1/national-address/:poiNumber?POIType=CRNumber&mpResponse=true",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "saudi-post",
+            "v1",
+            "national-address",
+            ":poiNumber"
+          ],
+          "query": [
+            {
+              "key": "POIType",
+              "value": "CRNumber"
+            },
+            {
+              "key": "mpResponse",
+              "value": "true"
+            }
+          ],
+          "variable": [
+            {
+              "key": "poiNumber",
+              "value": "7001354740"
+            }
+          ]
+        },
+        "description": "Retrieve the national address for establishments or individuals based on POINumber and POIType."
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "accept_language",
+      "value": "en"
+    },
+    {
+      "key": "x_request_id",
+      "value": ""
+    },
+    {
+      "key": "POINumber",
+      "value": ""
+    },
+    {
+      "key": "POIType",
+      "value": "NationalID"
+    },
+    {
+      "key": "access-token",
+      "value": ""
+    },
+    {
+      "key": "host",
+      "value": "https://test.api.neotek.sa"
+    },
+    {
+      "key": "clientId",
+      "value": "d905b5912cdc6c066b6672eb946f18f6"
+    },
+    {
+      "key": "clientSecret",
+      "value": "c40271af19ce9a7124c061d45283ed34"
+    }
+  ]
+}

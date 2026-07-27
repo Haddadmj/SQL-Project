@@ -1,0 +1,423 @@
+{
+  "info": {
+    "_postman_id": "b8864136-c010-4b96-829c-6dba1b61f778",
+    "name": "Qawaem | ARB app",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "UAT",
+      "item": [
+        {
+          "name": "Generate Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = JSON.parse(responseBody);\r",
+                  "pm.collectionVariables.set(\"access-token\", data.access_token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "d905b5912cdc6c066b6672eb946f18f6",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "c40271af19ce9a7124c061d45283ed34",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "qawaem_establishment_information",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://test.api.neotek.sa/oauth2security/oauth2/token",
+              "protocol": "https",
+              "host": [
+                "test",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "oauth2security",
+                "oauth2",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get CR Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {}
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://test.api.neotek.sa/qawaem/v1/get-cr-details?cRNumber=7000953104",
+              "protocol": "https",
+              "host": [
+                "test",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "qawaem",
+                "v1",
+                "get-cr-details"
+              ],
+              "query": [
+                {
+                  "key": "cRNumber",
+                  "value": "7000953104"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get FIles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {}
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://test.api.neotek.sa/qawaem/v1/get-filing-files?filingCode=214402",
+              "protocol": "https",
+              "host": [
+                "test",
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "qawaem",
+                "v1",
+                "get-filing-files"
+              ],
+              "query": [
+                {
+                  "key": "filingCode",
+                  "value": "214402"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Production",
+      "item": [
+        {
+          "name": "Generate Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = JSON.parse(responseBody);\r",
+                  "pm.collectionVariables.set(\"access-token\", data.access_token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "34b4873b8e16942eeafe03f2a9237b75",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "9eab4347a3c0ed15bdf435d5ec32237c",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "qawaem_establishment_information",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://api.neotek.sa/oauth2security/oauth2/token",
+              "protocol": "https",
+              "host": [
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "oauth2security",
+                "oauth2",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get CR Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {}
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://api.neotek.sa/qawaem/v1/get-cr-details?cRNumber=7000953104",
+              "protocol": "https",
+              "host": [
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "qawaem",
+                "v1",
+                "get-cr-details"
+              ],
+              "query": [
+                {
+                  "key": "cRNumber",
+                  "value": "7000953104"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get FIles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {}
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://api.neotek.sa/qawaem/v1/get-filing-files?filingCode=214140",
+              "protocol": "https",
+              "host": [
+                "api",
+                "neotek",
+                "sa"
+              ],
+              "path": [
+                "qawaem",
+                "v1",
+                "get-filing-files"
+              ],
+              "query": [
+                {
+                  "key": "filingCode",
+                  "value": "214140"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "access-token",
+      "value": ""
+    }
+  ]
+}

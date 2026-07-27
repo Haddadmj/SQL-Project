@@ -1,0 +1,318 @@
+{
+  "info": {
+    "_postman_id": "17100c6a-253c-4ec8-b085-9f59be1845d6",
+    "name": "Nitaqat Sandbox Copy",
+    "description": "Credit Risk Assessment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42968842"
+  },
+  "item": [
+    {
+      "name": "Generate Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var data = JSON.parse(responseBody);\r",
+              "pm.collectionVariables.set(\"access-token\", data.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "fa86cc417570f44f70857a31aa1d2d37",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "277dd73f15a80e6e3b389ab94185df62",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "establishment_information",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://sit.api.neotek.sa/oauth2security/oauth2/token",
+          "protocol": "https",
+          "host": [
+            "sit",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "oauth2security",
+            "oauth2",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Basic Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-request-id",
+            "value": "REPLACE_THIS_VALUE",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"Data\": {\r\n    // \"CRNumber\": \"1234567891\",\r\n    \"SevenHundredNumber\": \"7001345276\"\r\n  }\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://sit.api.neotek.sa/establishment-information/v1/get-basic-details",
+          "protocol": "https",
+          "host": [
+            "sit",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "establishment-information",
+            "v1",
+            "get-basic-details"
+          ]
+        },
+        "description": "This path is used to create an credit risk assessmen request"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Advanced Details",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer AAIgZDkwNWI1OTEyY2RjNmMwNjZiNjY3MmViOTQ2ZjE4Zjax5CP6jdDbmNee8-YCpCStN5_f8-wW7hHd7hYMFQTmpsjLQ31VlXSIzsTfWMSSvlWnFRUCYVLn-N1k37d0e83MqobJeUz2yrX_C39UG1WNwMjx72-tHr0ZTgXFZSVcwHtHX6XdpFQxDhC-FeSF5PCo"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Data\": {\n    \"SevenHundredNumber\": \"7001345276\"\n  }\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://sit.api.neotek.sa/establishment-information/v1/get-advanced-details",
+          "protocol": "https",
+          "host": [
+            "sit",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "establishment-information",
+            "v1",
+            "get-advanced-details"
+          ]
+        },
+        "description": "This path is used to create an credit risk assessmen request"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Premium Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access-token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-request-id",
+            "value": "REPLACE_THIS_VALUE",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"Data\": {\r\n    // \"CRNumber\": \"1234567891\",\r\n    \"SevenHundredNumber\": \"7001345276\"\r\n  }\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://sit.api.neotek.sa/establishment-information/v1/get-premium-details",
+          "protocol": "https",
+          "host": [
+            "sit",
+            "api",
+            "neotek",
+            "sa"
+          ],
+          "path": [
+            "establishment-information",
+            "v1",
+            "get-premium-details"
+          ]
+        },
+        "description": "This path is used to create an credit risk assessmen request"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://test.api.neotek.sa/credit-risk-assessment/v1",
+      "type": "string"
+    },
+    {
+      "key": "access-token",
+      "value": ""
+    },
+    {
+      "key": "external-gw",
+      "value": "https://test.api.neotek.sa",
+      "type": "string"
+    },
+    {
+      "key": "public-gw",
+      "value": "https://test.api.public.neotek.sa",
+      "type": "string"
+    },
+    {
+      "key": "RequestId",
+      "value": ""
+    }
+  ]
+}
