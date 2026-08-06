@@ -1,0 +1,159 @@
+================================================================================
+APIC TOOLKIT COMMANDS - PRODUCT / APPLICATION SUBSCRIPTION LISTING
+================================================================================
+Run these by hand, in order, from a terminal where `apic` is on PATH.
+Replace <PLACEHOLDERS> as you go - each step tells you where its value came from.
+
+Variables used below:
+  SERVER = apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa
+  USER   = malhaddad
+  ORG    = <PROVIDER_ORG>     (from step 3)
+  CATALOG= <CATALOG>          (from step 4)
+
+Notes:
+  * SERVER is a bare hostname - no https:// prefix.
+  * Add `--format json --output -` to any list command to get JSON on stdout
+    instead of a formatted table. Useful for piping into jq.
+  * Add `--live` / `--scope catalog` where shown; the defaults differ per command.
+
+
+--------------------------------------------------------------------------------
+STEP 1 - FIND THE REALM (do this first; wrong realm = login failure)
+--------------------------------------------------------------------------------
+apic identity-providers:list --scope provider --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa
+
+  Output lists the provider realms. You want the one backed by the local user
+  registry - usually:
+      provider/default-idp-2    local user registry (api-manager-lur)
+      provider/default-idp-1    OIDC / common services
+  Use the exact realm name from this output in step 2.
+
+
+--------------------------------------------------------------------------------
+STEP 2 - LOGIN
+--------------------------------------------------------------------------------
+apic login --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --username malhaddad --realm provider/default-idp-2
+
+  Omitting --password makes the toolkit prompt for it (keeps it out of your
+  shell history). To pass it inline instead:
+
+apic login --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --username malhaddad --password "<PASSWORD>" --realm provider/default-idp-2
+
+  Verify the session:
+
+apic --version
+apic orgs:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --my
+
+
+--------------------------------------------------------------------------------
+STEP 3 - LIST PROVIDER ORGS  -> gives you ORG
+--------------------------------------------------------------------------------
+apic orgs:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --my
+
+  Take the `name` column. That is <PROVIDER_ORG> for every command below.
+
+
+--------------------------------------------------------------------------------
+STEP 4 - LIST CATALOGS  -> gives you CATALOG
+--------------------------------------------------------------------------------
+apic catalogs:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG>
+
+  Take the `name` column (e.g. sandbox). That is <CATALOG> below.
+
+
+--------------------------------------------------------------------------------
+STEP 5 - LIST PRODUCTS IN THE CATALOG
+--------------------------------------------------------------------------------
+apic products:list-all --scope catalog --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG>
+
+  Published products only:
+
+apic products:list-all --scope catalog --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --format json --output - > products.json
+
+  Each entry has name, version, title, state and url. Keep the `url` values -
+  subscriptions reference products by URL, not by name.
+
+
+--------------------------------------------------------------------------------
+STEP 6 - LIST CONSUMER ORGS IN THE CATALOG
+--------------------------------------------------------------------------------
+apic consumer-orgs:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG>
+
+  Take each `name`. You need one per <CONSUMER_ORG> in step 7.
+
+
+--------------------------------------------------------------------------------
+STEP 7 - LIST APPS IN EACH CONSUMER ORG  (repeat per consumer org)
+--------------------------------------------------------------------------------
+apic apps:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --consumer-org <CONSUMER_ORG>
+
+  Take each `name`. You need one per <APP> in step 8.
+
+
+--------------------------------------------------------------------------------
+STEP 8 - LIST SUBSCRIPTIONS  (repeat per consumer org + app)
+--------------------------------------------------------------------------------
+apic subscriptions:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --consumer-org <CONSUMER_ORG> --app <APP>
+
+  Each subscription shows the plan and a product_url. Match that product_url
+  back to the products from step 5 to get the product name/title.
+
+  This is the slow part: one command per app. See the loop scripts at the
+  bottom of this file to do it in one pass.
+
+
+--------------------------------------------------------------------------------
+STEP 9 - LOGOUT
+--------------------------------------------------------------------------------
+apic logout --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa
+
+
+================================================================================
+OPTIONAL - LOOP OVER EVERYTHING IN ONE PASS
+================================================================================
+
+--- BASH / ZSH (macOS, Linux, Git Bash) - requires jq ------------------------
+SERVER=apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa
+ORG=<PROVIDER_ORG>
+CATALOG=<CATALOG>
+
+apic products:list-all --scope catalog --server $SERVER --org $ORG --catalog $CATALOG --format json --output - > products.json
+
+for CO in $(apic consumer-orgs:list --server $SERVER --org $ORG --catalog $CATALOG --format json --output - | jq -r '.results[].name'); do
+  for APP in $(apic apps:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $CO --format json --output - | jq -r '.results[].name'); do
+    echo "=== $CO / $APP ==="
+    apic subscriptions:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $CO --app $APP --format json --output - | jq -r '.results[] | .product_url'
+  done
+done
+
+
+--- POWERSHELL --------------------------------------------------------------
+$SERVER  = "apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa"
+$ORG     = "<PROVIDER_ORG>"
+$CATALOG = "<CATALOG>"
+
+$cos = (apic consumer-orgs:list --server $SERVER --org $ORG --catalog $CATALOG --format json --output - | ConvertFrom-Json).results
+foreach ($co in $cos) {
+  $apps = (apic apps:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $co.name --format json --output - | ConvertFrom-Json).results
+  foreach ($app in $apps) {
+    Write-Host "=== $($co.name) / $($app.name) ==="
+    (apic subscriptions:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $co.name --app $app.name --format json --output - | ConvertFrom-Json).results |
+      ForEach-Object { $_.product_url }
+  }
+}
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+"Unable to find realm"          -> re-run step 1, use the exact realm string.
+"invalid_grant"                 -> username/password wrong for that realm.
+"self signed certificate"       -> export NODE_TLS_REJECT_UNAUTHORIZED=0
+                                   (PowerShell: $env:NODE_TLS_REJECT_UNAUTHORIZED=0)
+                                   Development/non-prod only.
+"Not authorized"                -> the user lacks a role in that org/catalog.
+"apic: command not found"       -> toolkit not on PATH; download it from
+                                   API Manager > Download Toolkit.
+Flags rejected                  -> the toolkit version matters. Check the real
+                                   signature with:  apic <command> --help
+                                   e.g.  apic subscriptions:list --help
