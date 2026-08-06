@@ -93,13 +93,45 @@ apic apps:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non
 --------------------------------------------------------------------------------
 STEP 8 - LIST SUBSCRIPTIONS  (repeat per consumer org + app)
 --------------------------------------------------------------------------------
-apic subscriptions:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --consumer-org <CONSUMER_ORG> --app <APP>
+The DEFAULT table output does NOT show which product was subscribed to - it only
+shows the subscription id, plan and state. You must ask for the product field.
 
-  Each subscription shows the plan and a product_url. Match that product_url
-  back to the products from step 5 to get the product name/title.
+8a. Ask for the product fields explicitly:
 
-  This is the slow part: one command per app. See the loop scripts at the
-  bottom of this file to do it in one pass.
+apic subscriptions:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --consumer-org <CONSUMER_ORG> --app <APP> --fields id,plan,state,product_url
+
+8b. If --fields is rejected or product_url comes back empty, take the full JSON
+    record instead - the product reference is always in there somewhere:
+
+apic subscriptions:list --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --consumer-org <CONSUMER_ORG> --app <APP> --format json --output -
+
+    Depending on toolkit version the field is named product_url, product, or
+    product_ref. Look at one record first to see which you have.
+
+8c. Fallback - fetch a single subscription in full detail by its id:
+
+apic subscriptions:get --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --consumer-org <CONSUMER_ORG> --app <APP> --format json --output - <SUBSCRIPTION_ID>
+
+
+--------------------------------------------------------------------------------
+STEP 8d - TURN THE PRODUCT URL INTO A PRODUCT NAME
+--------------------------------------------------------------------------------
+A product_url looks like:
+  https://<SERVER>/api/catalogs/<catalog-id>/products/9f3c1e5a-....
+
+There is no "which products is this app subscribed to" command - you have to
+join it yourself. Two ways:
+
+  (i) Match against step 5. The products.json from step 5 has both `url` and
+      `name`/`title`/`version`. Look up the subscription's product_url in that
+      list. This is the fast way - one product list, no extra calls.
+
+ (ii) Resolve the id directly (the last path segment of product_url):
+
+apic products:get --scope catalog --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa --org <PROVIDER_ORG> --catalog <CATALOG> --id <PRODUCT_ID> --fields name,title,version
+
+This is the slow part overall: one subscriptions call per app. See the loop
+scripts at the bottom to do the whole join in one pass.
 
 
 --------------------------------------------------------------------------------
@@ -112,19 +144,36 @@ apic logout --server apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp
 OPTIONAL - LOOP OVER EVERYTHING IN ONE PASS
 ================================================================================
 
+Both loops below build the product-URL -> product-name lookup from step 5 first,
+then print APP -> PRODUCT lines. That join is the whole point - without it you
+only get opaque URLs.
+
 --- BASH / ZSH (macOS, Linux, Git Bash) - requires jq ------------------------
 SERVER=apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek.sa
 ORG=<PROVIDER_ORG>
 CATALOG=<CATALOG>
 
+# 1. Product lookup: url -> "title (name:version)"
 apic products:list-all --scope catalog --server $SERVER --org $ORG --catalog $CATALOG --format json --output - > products.json
 
+# 2. Walk consumer orgs -> apps -> subscriptions, resolving each product_url
 for CO in $(apic consumer-orgs:list --server $SERVER --org $ORG --catalog $CATALOG --format json --output - | jq -r '.results[].name'); do
   for APP in $(apic apps:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $CO --format json --output - | jq -r '.results[].name'); do
     echo "=== $CO / $APP ==="
-    apic subscriptions:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $CO --app $APP --format json --output - | jq -r '.results[] | .product_url'
+    apic subscriptions:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $CO --app $APP --format json --output - \
+      | jq -r --slurpfile prods products.json '
+          ($prods[0].results
+            | map({ key: (.url // ""), value: ((.title // .name) + " (" + (.name // "?") + ":" + (.version // "?") + ")") })
+            | from_entries) as $lookup
+          | .results[]
+          | ($lookup[.product_url // ""] // (.product_url // "<no product on record>")) as $product
+          | "  - " + $product + "   [plan: " + (.plan // "?") + ", state: " + (.state // "?") + "]"'
   done
 done
+
+  Produces:
+    === finance-corg / billing-app ===
+      - Accounts API (accounts-api:1.0.0)   [plan: default-plan, state: enabled]
 
 
 --- POWERSHELL --------------------------------------------------------------
@@ -132,13 +181,30 @@ $SERVER  = "apic-nonpr-35f19ae6-api-manager-cp4i-nonprod.apps.nt-non-cp4i.neotek
 $ORG     = "<PROVIDER_ORG>"
 $CATALOG = "<CATALOG>"
 
+# 1. Product lookup: url -> "title (name:version)"
+$products = (apic products:list-all --scope catalog --server $SERVER --org $ORG --catalog $CATALOG --format json --output - | ConvertFrom-Json).results
+$lookup = @{}
+foreach ($p in $products) {
+  if ($p.url) {
+    $title = if ($p.title) { $p.title } else { $p.name }
+    $lookup[$p.url] = "$title ($($p.name):$($p.version))"
+  }
+}
+
+# 2. Walk consumer orgs -> apps -> subscriptions, resolving each product_url
 $cos = (apic consumer-orgs:list --server $SERVER --org $ORG --catalog $CATALOG --format json --output - | ConvertFrom-Json).results
 foreach ($co in $cos) {
   $apps = (apic apps:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $co.name --format json --output - | ConvertFrom-Json).results
   foreach ($app in $apps) {
     Write-Host "=== $($co.name) / $($app.name) ==="
-    (apic subscriptions:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $co.name --app $app.name --format json --output - | ConvertFrom-Json).results |
-      ForEach-Object { $_.product_url }
+    $subs = (apic subscriptions:list --server $SERVER --org $ORG --catalog $CATALOG --consumer-org $co.name --app $app.name --format json --output - | ConvertFrom-Json).results
+    foreach ($s in $subs) {
+      $product = if ($s.product_url -and $lookup.ContainsKey($s.product_url)) {
+                   $lookup[$s.product_url]
+                 } elseif ($s.product_url) { $s.product_url }
+                 else { "<no product on record>" }
+      Write-Host "  - $product   [plan: $($s.plan), state: $($s.state)]"
+    }
   }
 }
 
